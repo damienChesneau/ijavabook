@@ -1,5 +1,9 @@
 package fr.upem.jshellbook;
 
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
+
 /**
  * JShell Book program input.
  *
@@ -7,8 +11,8 @@ package fr.upem.jshellbook;
  */
 public class MainTest {
 
-
-    public static void main(String[] args) {
-        //Let's play !
+    @Test
+    public void exemple() {
+        assertEquals("", "");
     }
 }
