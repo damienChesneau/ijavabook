@@ -1,4 +1,4 @@
-package fr.upem.jshellbook;
+package fr.upem.ijavabook;
 
 /**
  * JShell Book program input.
