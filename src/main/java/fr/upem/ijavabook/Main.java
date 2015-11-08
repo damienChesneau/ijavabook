@@ -1,5 +1,8 @@
 package fr.upem.ijavabook;
 
+import fr.upem.ijavabook.server.Server;
+import fr.upem.ijavabook.server.Servers;
+
 /**
  * JShell Book program input.
  *
@@ -9,6 +12,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        //Let's play !
+        Server srv = Servers.getServer();
+        srv.start();
     }
 }
