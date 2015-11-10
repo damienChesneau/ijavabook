@@ -10,11 +10,11 @@ import java.util.Objects;
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
 class Route {
-    private final String route;
+    private final String routePath;
     private final Handler<RoutingContext> event;
 
-    Route(String route, Handler<RoutingContext> event) {
-        this.route = Objects.requireNonNull(route);
+    Route(String routePath, Handler<RoutingContext> event) {
+        this.routePath = Objects.requireNonNull(routePath);
         this.event = Objects.requireNonNull(event);
     }
 
@@ -23,6 +23,6 @@ class Route {
     }
 
     public String getRoute() {
-        return route;
+        return routePath;
     }
 }

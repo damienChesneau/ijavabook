@@ -4,6 +4,10 @@
     <script src="js/index.js" defer></script>
 </head>
 <body>
+    <form onsubmit="return false;">
+        <input type="text" name="message" value="Hello, World!"/>
+        <input type="button" value="Data to srv" onclick="send(this.form.message.value)"/>
+    </form>
 
 </body>
 </html>
