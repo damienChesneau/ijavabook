@@ -39,8 +39,8 @@ class RouteManager extends AbstractVerticle {
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-     static void webSocketExercice(ServerWebSocket sws) {
-        if (sws.path().equals("/exercice")) {
+    static void webSocketExercice(ServerWebSocket sws) {
+        if ("/exercice".equals(sws.path())) {
             sws.handler((buf) -> {
                 System.out.println(buf);
                 sws.writeFinalTextFrame("Hello");
