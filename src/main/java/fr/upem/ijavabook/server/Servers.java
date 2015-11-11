@@ -7,7 +7,7 @@ package fr.upem.ijavabook.server;
 public class Servers {
 
     static final int SERVER_PORT = 8989;
-    private static final Server SERVER_INSTANCE = new ServerImpl();
+    private static Server SERVER_INSTANCE;
 
     private Servers() {
     }
@@ -18,6 +18,7 @@ public class Servers {
      * @return a singleton of server controls.
      */
     public static Server getServer(){
+        SERVER_INSTANCE = new ServerImpl();
         return SERVER_INSTANCE;
     }
 

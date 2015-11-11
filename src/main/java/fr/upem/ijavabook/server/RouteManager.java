@@ -27,7 +27,7 @@ class RouteManager extends AbstractVerticle {
      * Vertx is a super instance.
      */
     @Override
-    public void start() {
+    public void start()  {
         Router router = Router.router(vertx);
         // route to JSON REST APIs
         routes.forEach((routes) -> router.get(routes.getRoute()).handler(routes.getEvent()));

@@ -1,5 +1,6 @@
 package fr.upem.ijavabook.exmanager;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -10,7 +11,5 @@ public interface ExerciceService {
      * @param Filename
      * @return HTML representation.
      */
-    String getExercise(String name);
-
-    String getExercise(Path file);
+    String getExercise(Path file) throws IOException;
 }

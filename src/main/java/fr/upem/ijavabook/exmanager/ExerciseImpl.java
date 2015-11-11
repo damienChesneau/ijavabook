@@ -1,35 +1,22 @@
 package fr.upem.ijavabook.exmanager;
 
-import fr.upem.ijavabook.exmanager.parser.CompleteDslParser;
-import fr.upem.ijavabook.exmanager.parser.Task;
-import fr.upem.ijavabook.exmanager.parser.TaskList;
-import org.parboiled.Parboiled;
-import org.parboiled.parserunners.RecoveringParseRunner;
-import org.parboiled.support.ParsingResult;
+import fr.upem.ijavabook.exmanager.parser.Parsers;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
-public class ExerciseImpl implements ExerciceService {
-    @Override
-    public String getExercise(String name) {
-        return getExercise(Paths.get(name));
-    }
+class ExerciseImpl implements ExerciceService {
 
     @Override
-    public String getExercise(Path file) {
+    public String getExercise(Path file) throws IOException {
         String line1 = "![Alt text]\n";
-
-        String dslString = line1;//+ "\n" + line2 + "\n" + line3;
-        CompleteDslParser parser = Parboiled.createParser(CompleteDslParser.class);
-        ParsingResult<TaskList> result = new RecoveringParseRunner<TaskList>(
-                parser.Tasks()).run(dslString);
-        TaskList taskList = result.resultValue;
-        List<Task> tasks = taskList.tasks();
-        return null;
+        String value = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
+        Parsers.markdownToHtml(value);
+        return "<h1> Hello </h1>";
     }
 }
