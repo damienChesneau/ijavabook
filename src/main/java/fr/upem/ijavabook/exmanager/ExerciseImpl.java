@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
-class ExerciseImpl implements ExerciceService {
+class ExerciseImpl implements ExerciseService {
 
     @Override
     public String getExercise(Path file) throws IOException {

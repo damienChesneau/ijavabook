@@ -5,43 +5,51 @@ import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.support.Var;
 
+/**
+ * Represent Markdown grammar.
+ * @author Damien Chesneau - contact@damienchesneau.fr
+ */
 @BuildParseTree
 class GrammarImpl extends BaseParser<Object> {//DEV
 
-    public Rule Tasks() {
+    public Rule Lines() {
         Var<MarkdownItem> tasks = new Var<>(new MarkdownItem());
-        return Sequence(OneOrMore(Task(tasks)), EOI, push(tasks.getAndClear()));
+        return Sequence(OneOrMore(Line(tasks)), EOI, push(tasks.getAndClear()));
     }
 
-    public Rule Task(final Var<MarkdownItem> tasks) {
-        Var<Img> dto = new Var<>(new Img());
-        return Sequence(PictureSymb(dto), Optional(Options(dto)),
-                Optional(Newline()), push(tasks.get().add(dto.get()))).label(
+    public Rule Line(final Var<MarkdownItem> tasks) {
+        Var<PictureTag.Builder> dto = new Var<>(new PictureTag.Builder());
+        return Sequence(PictureSymbole(dto), Optional(Options(dto)),
+                Optional(Newline()), push(tasks.get().addPicture(dto.get()))).label(
                 "task");
     }
 
-    public Rule PictureSymb(final Var<Img> dto) {
+    public Rule PictureSymbole(final Var<PictureTag.Builder> dto) {
         return Sequence(PicturePrefix(), ArrayPrefix(), AltData(dto), ArraySuffix(),
-                ParenPrefix(), SrcVal(dto), push(""));
+                ParenPrefix(), SrcVal(dto), ImgTitle(dto), ParenSuffix(), push(""));
     }
 
-    public Rule AltData(final Var<Img> dto) {
+    public Rule ImgTitle(final Var<PictureTag.Builder> dto) {
+        return Sequence(String('\"'), StringVal(), push(dto.get().setTitle(match())), Ch('\"'));
+    }
+
+    public Rule AltData(final Var<PictureTag.Builder> dto) {
         return Sequence(StringVal()
-                , push(dto.get().altText(match())));
+                , push(dto.get().setAltText(match().trim())));
     }
 
-    public Rule SrcVal(final Var<Img> dto) {
-        return Sequence(PathVal(), push(dto.get().setSrc(match())));
+    public Rule SrcVal(final Var<PictureTag.Builder> dto) {
+        return Sequence(PathVal(), push(dto.get().setSrc(match().trim())));
     }
 
     public Rule PathVal() {
-        return Sequence(Optional(Ch('/')), ZeroOrMore(StringVal(), Ch('/'), Optional(Ch('/'))));
+        return Sequence(ZeroOrMore((Ch('/')), StringVal()), TestNot(Ch(' ')));
     }
-
 
     public Rule StringVal() {
         return ZeroOrMore(Optional(CharRange('A', 'Z')),
                 CharRange('a', 'z'),
+                Optional(Ch('.')),
                 Optional(CharRange('A', 'Z')),
                 Optional(Ch(' ')),
                 Optional(CharRange('A', 'Z')), Optional(TestNot(Ch(']'))));
@@ -55,7 +63,7 @@ class GrammarImpl extends BaseParser<Object> {//DEV
         return String("]");
     }
 
-    public Rule Options(final Var<Img> dto) {
+    public Rule Options(final Var<PictureTag.Builder> dto) {
         return Sequence(OptSep(),
                 Optional(""));
     }
@@ -63,7 +71,6 @@ class GrammarImpl extends BaseParser<Object> {//DEV
     public Rule OptSep() {
         return Sequence(OptSp(), OptLim(), OptSp());
     }
-
 
     public Rule PicturePrefix() {
         return Ch('!');
@@ -100,7 +107,6 @@ class GrammarImpl extends BaseParser<Object> {//DEV
     public Rule ArraySuffix() {
         return Ch(']');
     }
-
 
     public Rule Newline() {
         return FirstOf('\n', Sequence('\r', Optional('\n')));

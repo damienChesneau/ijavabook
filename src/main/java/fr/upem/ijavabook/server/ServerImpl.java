@@ -6,7 +6,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.ArrayList;
 
 /**
- * Implentation how contols all of server flux.
+ * Implentation how controls all of server flux.
  *
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
@@ -19,10 +19,11 @@ class ServerImpl implements Server {
     }
 
     @Override
-    public void start() {
+    public String start() {
         ArrayList<Route> routes = new ArrayList<>();
         routes.add(new Route("/exercise/:id", ServerImpl::getExerciceHandle));
         web_srv.deployVerticle(new RouteManager(routes));
+        return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
     public static void getExerciceHandle(RoutingContext rc) {

@@ -7,7 +7,11 @@ public class Exercises {
     private Exercises() {
     }
 
-    public static ExerciceService getExerciseSrv() {
+    /**
+     * Hide implementation of exercise.
+     * @return An implementation to get your exercices.
+     */
+    public static ExerciseService getExerciseSrv() {
         return new ExerciseImpl();
     }
 }

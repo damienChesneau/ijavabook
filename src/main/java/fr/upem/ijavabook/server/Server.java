@@ -8,7 +8,7 @@ public interface Server {
     /**
      * Start server.
      */
-    void start();
+    String start();
 
     /**
      * Stop server.

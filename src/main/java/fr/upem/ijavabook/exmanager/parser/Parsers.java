@@ -10,7 +10,6 @@ public class Parsers {
 
     /**
      * Markdown parser.
-     *
      * @param content to traduce.
      * @return HTML tags.
      */

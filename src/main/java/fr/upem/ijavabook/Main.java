@@ -20,12 +20,13 @@ public class Main {
     public static void main(String[] args) {
         Server srv = Servers.getServer();
         try {
-            srv.start();
+            String start = srv.start();
+            System.out.println("Server started on : " + start);
             Path path = Paths.get("markdown/file.text");
             System.out.println(path.toAbsolutePath());
             String exercise = Exercises.getExerciseSrv().getExercise(path);
             System.out.println(exercise);
-        } catch (BindException e){
+        } catch (BindException e) {
             System.err.println("err");
         } catch (IOException e) {
             System.out.println("Unable to get your .text file.");

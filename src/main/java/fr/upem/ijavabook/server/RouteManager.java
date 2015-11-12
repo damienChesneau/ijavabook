@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 class RouteManager extends AbstractVerticle {
 
-    private List<Route> routes;
+    private final List<Route> routes;
 
     RouteManager(List<Route> routes) {
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
@@ -35,11 +35,11 @@ class RouteManager extends AbstractVerticle {
         router.route().handler(StaticHandler.create());
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.requestHandler(router::accept);
-        httpServer.websocketHandler(RouteManager::webSocketExercice);
+        httpServer.websocketHandler(RouteManager::webSocketExercise);
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-    static void webSocketExercice(ServerWebSocket sws) {
+    static void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
             sws.handler((buf) -> {
                 System.out.println(buf);
