@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -66,19 +67,23 @@ class Watcher {
     public void start() throws IOException, InterruptedException {
         while (!Thread.interrupted()) {
             for (WatchEvent event : initializer().pollEvents()) {
-                if (!Files.isHidden(Paths.get(event.context().toString()))) {
-                    locker.lock();
-                    action(event);
-                    locker.unlock();
+                if (testHiddedFiles().test(event.context().toString())) {
+                    callUserLambda(event);
                 }
             }
         }
     }
 
-    private void action(WatchEvent event) {
+    private Predicate<String> testHiddedFiles() {
+        return (str) -> true;
+    }
+
+    private void callUserLambda(WatchEvent event) {
+        locker.lock();
         Consumer<String> consumer = calls.getOrDefault(event.kind().toString(), (cs) -> {
         });
         consumer.accept(event.context().toString());
+        locker.unlock();
     }
 
     public static void main(String[] args) {

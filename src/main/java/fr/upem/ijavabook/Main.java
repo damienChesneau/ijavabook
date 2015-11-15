@@ -1,5 +1,6 @@
 package fr.upem.ijavabook;
 
+import com.sun.media.jfxmedia.logging.Logger;
 import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.server.Server;
 import fr.upem.ijavabook.server.Servers;
@@ -27,9 +28,9 @@ public class Main {
             String exercise = Exercises.getExerciseSrv().getExercise(path);
             System.out.println(exercise);
         } catch (BindException e) {
-            System.err.println("err");
+            Logger.logMsg(Logger.ERROR, "Server is already in use.");
         } catch (IOException e) {
-            System.out.println("Unable to get your .text file.");
+            Logger.logMsg(Logger.ERROR, "Unable to get your .text file.");
         }
     }
 }

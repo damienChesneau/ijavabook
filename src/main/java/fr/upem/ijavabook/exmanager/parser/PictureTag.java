@@ -33,13 +33,13 @@ public class PictureTag implements HtmlProducer {
 
     @Override
     public String toString() {
-        return "Image [getAltText=" + altText + ", getSrc=" + src + ", title=" + title + "]";
+        return "Image [getContent=" + altText + ", getHref=" + src + ", title=" + title + "]";
     }
 
     @Override
     public String produce() {
         String html = "<p>";
-        html += "<img getSrc=\"";
+        html += "<img getHref=\"";
         html += src;
         html += "\" alt=\"";
         html += altText;
