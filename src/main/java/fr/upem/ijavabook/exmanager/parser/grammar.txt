@@ -1,0 +1,100 @@
+lines ->
+    |line lines
+
+line ->
+    | html
+    | markdown
+
+markdown -> bloc
+	|inline
+	
+bloc -> 
+	| elemBloc bloc
+	| line
+
+elemBloc -> headers
+	| blockquotes
+	| lists
+	| codeBlock
+	| horizontalRule
+	
+inline -> links
+	| emphasis
+	| code
+	| images
+	
+headers -> header1
+	|header2
+	|### text
+	|#### text
+	|##### text
+	|###### text
+	
+header1 -> # text
+	|text sublines=
+	
+sublines= -> = sublines
+	| =
+	
+header2 -> ## text
+	| text sublines-
+	
+sublines- -> -sublines
+	|-
+	
+blockquotes -> > firstquote blockquotes
+	| > firstquote
+	
+firstquote -> line
+	| > line
+	
+lists -> starList
+	| plusList
+	| minusList
+	| numberedList
+	
+starList -> * line starList
+	|* line 
+	
+plusList -> + line plusList
+	|+ line 
+	
+minusList -> - line minusList
+	|- line 
+	
+numberedList -> number. line numberedList
+	| number. line 
+	
+codeBlock -> \t line codeBlock
+	|\t line 
+
+horizontalRule -> starRule
+	|minusRule
+	|underscoreRule
+	
+starRule -> * starRule
+	|*
+	
+minusRule -> - minuRule
+	|-
+	
+underscoreRule -> _ underscorRule
+	| _
+
+
+/*Bof, à revoir je pense */
+links -> [text](text "text") /* premier text c'est ce qu'il y a entre les deux balises, le deuxième le chemin du lien, le troisième le titre(optionnel)*/
+    | {text](text)
+
+emphasis -> simpleEmphasis
+    | strongEmphasis
+
+simpleEmphasis -> *text*
+    | _text_
+
+strongEmphasis -> **text**
+    | __text__
+
+code -> `text`
+
+images -> ![text](text) /*premier texte le titre, le deuxième le chemin*/

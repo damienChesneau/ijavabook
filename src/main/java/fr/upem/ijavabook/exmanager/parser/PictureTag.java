@@ -19,7 +19,7 @@ public class PictureTag implements HtmlProducer {
         this.title = Objects.requireNonNull(title);
     }
 
-    public final String getAltText() {
+    /*public final String getAltText() {
         return altText;
     }
 
@@ -29,7 +29,7 @@ public class PictureTag implements HtmlProducer {
 
     public String getTitle() {
         return title;
-    }
+    }*/
 
     @Override
     public String toString() {

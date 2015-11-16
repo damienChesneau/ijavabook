@@ -16,7 +16,7 @@ public class LinkTag implements HtmlProducer {
         this.title = Objects.requireNonNull(title);
     }
 
-    public final String getContent() {
+    /*public final String getContent() {
         return content;
     }
 
@@ -26,11 +26,11 @@ public class LinkTag implements HtmlProducer {
 
     public String getTitle() {
         return title;
-    }
+    }*/
 
     @Override
     public String toString() {
-        return "Image [getContent=" + content + ", getHref=" + href + ", title=" + title + "]";
+        return "Link [getContent=" + content + ", getHref=" + href + ", title=" + title + "]";
     }
 
     @Override
