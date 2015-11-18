@@ -1,10 +1,8 @@
 package fr.upem.ijavabook.exmanager.parser;
 
-import com.sun.org.apache.xpath.internal.axes.NodeSequence;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
-import org.parboiled.support.Var;
 
 /**
  * Represent Markdown grammar.
@@ -17,18 +15,32 @@ class GrammarImplV2 extends BaseParser<Object> {//DEV
         return OneOrMore(CharRange(' ','~' ));
     }
 
+
+    Rule OneCharFrame(char c1, char c2, Rule r){
+        return Sequence(Ch(c1),
+                r,
+                Ch(c2));
+    }
+
     Rule Lines(){
         return Sequence(Line(),
                 EOI);
     }
 
     Rule Line(){
-        return FirstOf(Markdown(),
-                Html());
+        return FirstOf(Html(),
+                Markdown());
     }
 
     Rule Html(){
-        return Text();
+        return FirstOf(OneCharFrame('<','>',
+                Sequence(Text(),
+                        Ch('/'))),
+                Sequence(OneCharFrame('<','>',Text()),
+                        Text(),
+                        OneCharFrame('<','>',
+                                Sequence(Ch('/'),Text())))
+                );
     }
 
     Rule Markdown(){
@@ -60,31 +72,32 @@ class GrammarImplV2 extends BaseParser<Object> {//DEV
     Rule Headers(){
         return FirstOf(Header1(),
                 Header2(),
-                dashHeader("###"),
-                dashHeader("####"),
-                dashHeader("#####"),
-                dashHeader("######"));
+                DashHeader("###"),
+                DashHeader("####"),
+                DashHeader("#####"),
+                DashHeader("######"));
     }
 
-    Rule dashHeader(String dashs){
+    Rule DashHeader(String dashs){
         return Sequence(String(dashs),
                 Text());
     }
 
     Rule Header1(){
-        return FirstOf(dashHeader("#"),
-                Sequence(Text(),
-                        Ch('\n'),
-                        OneOrMore(Ch('=')),
-                        Ch('\n')));
+        return FirstOf(DashHeader("#"),
+                SublineHeader('+'));
     }
 
     Rule Header2(){
-        return FirstOf(dashHeader("##"),
-                Sequence(Text(),
-                        Ch('\n'),
-                        OneOrMore(Ch('-')),
-                        Ch('\n')));
+        return FirstOf(DashHeader("##"),
+                SublineHeader('-'));
+    }
+
+    Rule SublineHeader(char c){
+        return Sequence(Text(),
+                Ch('\n'),
+                OneOrMore(Ch(c)),
+                Ch('\n'));
     }
 
     Rule Blockquotes(){
@@ -98,24 +111,14 @@ class GrammarImplV2 extends BaseParser<Object> {//DEV
     }
 
     Rule Lists(){
-        return FirstOf(StarList(),
-                PlusList(),
-                MinusList(),
+        return FirstOf(SymbolList('*'),
+                SymbolList('+'),
+                SymbolList('-'),
                 NumberList());
     }
 
-    Rule StarList(){
-        return OneOrMore(Sequence(Ch('*'),
-                Line()));
-    }
-
-    Rule PlusList(){
-        return OneOrMore(Sequence(Ch('+'),
-                Line()));
-    }
-
-    Rule MinusList(){
-        return OneOrMore(Sequence(Ch('-'),
+    Rule SymbolList (char c){
+        return OneOrMore(Sequence(Ch(c),
                 Line()));
     }
 
@@ -134,5 +137,43 @@ class GrammarImplV2 extends BaseParser<Object> {//DEV
         return FirstOf(OneOrMore(Ch('*')),
                 OneOrMore(Ch('-')),
                 OneOrMore(Ch('*')));
+    }
+
+    Rule Links(){
+        return FirstOf(Sequence(
+                OneCharFrame('[', ']', Text()),
+                OneCharFrame('(', ')',
+                        Sequence(Text(),
+                                OneCharFrame('"', '"', Text())))),
+                Sequence(OneCharFrame('[', ']', Text()),
+                        OneCharFrame('(', ')', Text())));
+    }
+
+
+    Rule Emphasis(){
+        return FirstOf(StrongEmphasis(),
+                SimpleEmphasis());
+    }
+
+    Rule StrongEmphasis(){
+        return FirstOf(OneCharFrame('*', '*',
+                OneCharFrame('*','*',Text())),
+                OneCharFrame('_', '_',
+                        OneCharFrame('_','_',Text())));
+    }
+
+    Rule SimpleEmphasis(){
+        return FirstOf(OneCharFrame('*','*',Text()),
+                        OneCharFrame('_','_',Text()));
+    }
+
+    Rule Code(){
+        return OneCharFrame('\'','\'',Text());
+    }
+
+    Rule Images(){
+        return Sequence(Ch('!'),
+                OneCharFrame('[',']', Text()),
+                OneOrMore('(',')',Text()));
     }
 }

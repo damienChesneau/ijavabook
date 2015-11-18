@@ -84,7 +84,7 @@ underscoreRule -> _ underscorRule
 
 /*Bof, à revoir je pense */
 links -> [text](text "text") /* premier text c'est ce qu'il y a entre les deux balises, le deuxième le chemin du lien, le troisième le titre(optionnel)*/
-    | {text](text)
+    | [text](text)
 
 emphasis -> simpleEmphasis
     | strongEmphasis
