@@ -16,18 +16,6 @@ public class LinkTag implements HtmlProducer {
         this.title = Objects.requireNonNull(title);
     }
 
-    /*public final String getContent() {
-        return content;
-    }
-
-    public final String getHref() {
-        return href;
-    }
-
-    public String getTitle() {
-        return title;
-    }*/
-
     @Override
     public String toString() {
         return "Link [getContent=" + content + ", getHref=" + href + ", title=" + title + "]";

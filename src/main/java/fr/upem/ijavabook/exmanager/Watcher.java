@@ -75,7 +75,15 @@ class Watcher {
     }
 
     private Predicate<String> testHiddedFiles() {
-        return (str) -> true;
+        return (str) -> {
+            if (!showHideFiles) {
+                try {
+                    return (Files.isHidden(Paths.get(str))) ? false : true;
+                } catch (IOException e) { // If error, no problem we still print all.
+                }
+            }
+            return true;
+        };
     }
 
     private void callUserLambda(WatchEvent event) {
