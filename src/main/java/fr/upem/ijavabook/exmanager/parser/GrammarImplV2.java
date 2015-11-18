@@ -12,60 +12,127 @@ import org.parboiled.support.Var;
  */
 @BuildParseTree
 class GrammarImplV2 extends BaseParser<Object> {//DEV
-        Rule lines(){
-            return Sequence(line(),
-                    EOI);
-        }
 
-        Rule line(){
-            return FirstOf(markdown(),
-                    html());
-        }
+    Rule Text(){
+        return OneOrMore(CharRange(' ','~' ));
+    }
 
-        Rule html(){
-            return OneOrMore(CharRange((char)0,
-                    (char)255));
-        }
+    Rule Lines(){
+        return Sequence(Line(),
+                EOI);
+    }
 
-        Rule markdown(){
-            return FirstOf(bloc(),
-                    inline());
-        }
+    Rule Line(){
+        return FirstOf(Markdown(),
+                Html());
+    }
 
-        Rule bloc(){
-            return FirstOf(Sequence(elemBlock(),
-                    ZeroOrMore(bloc())),
-                    line());
-        }
+    Rule Html(){
+        return Text();
+    }
 
-         Rule elemBlock(){
-            return FirstOf(headers(),
-                    blockquotes(),
-                    lists(),
-                    codeBlock(),
-                    horizontale());
-        }
+    Rule Markdown(){
+        return FirstOf(Bloc(),
+                Inline());
+    }
 
-        Rule inline(){
-            return FirstOf(links(),
-                    emphasis(),
-                    code(),
-                    images());
-        }
+    Rule Bloc(){
+        return FirstOf(Sequence(ElemBlock(),
+                ZeroOrMore(Bloc())),
+                Line());
+    }
 
-        Rule headers(){
-            return FirstOf(header1(),
-                    header2(),
-                    dashHeader("###"),
-                    dashHeader("####"),
-                    dashHeader("#####"),
-                    dashHeader("######"));
-        }
+    Rule ElemBlock(){
+        return FirstOf(Headers(),
+                Blockquotes(),
+                Lists(),
+                CodeBlock(),
+                Horizontale());
+    }
 
-        Rule dashHeader(String dashs){
-            return Sequence(String(dashs),
-                    OneOrMore(CharRange((char)0,
-                            (char)255)));
-        }
+    Rule Inline(){
+        return FirstOf(Links(),
+                Emphasis(),
+                Code(),
+                Images());
+    }
 
+    Rule Headers(){
+        return FirstOf(Header1(),
+                Header2(),
+                dashHeader("###"),
+                dashHeader("####"),
+                dashHeader("#####"),
+                dashHeader("######"));
+    }
+
+    Rule dashHeader(String dashs){
+        return Sequence(String(dashs),
+                Text());
+    }
+
+    Rule Header1(){
+        return FirstOf(dashHeader("#"),
+                Sequence(Text(),
+                        Ch('\n'),
+                        OneOrMore(Ch('=')),
+                        Ch('\n')));
+    }
+
+    Rule Header2(){
+        return FirstOf(dashHeader("##"),
+                Sequence(Text(),
+                        Ch('\n'),
+                        OneOrMore(Ch('-')),
+                        Ch('\n')));
+    }
+
+    Rule Blockquotes(){
+        return OneOrMore(Sequence(Ch('>'),
+                FirstBlockquotes()));
+    }
+
+    Rule FirstBlockquotes(){
+        return FirstOf(Sequence(Ch('>'),Line()),
+                Line());
+    }
+
+    Rule Lists(){
+        return FirstOf(StarList(),
+                PlusList(),
+                MinusList(),
+                NumberList());
+    }
+
+    Rule StarList(){
+        return OneOrMore(Sequence(Ch('*'),
+                Line()));
+    }
+
+    Rule PlusList(){
+        return OneOrMore(Sequence(Ch('+'),
+                Line()));
+    }
+
+    Rule MinusList(){
+        return OneOrMore(Sequence(Ch('-'),
+                Line()));
+    }
+
+    Rule NumberList(){
+        return OneOrMore(Sequence(OneOrMore(CharRange('0','9')),
+                Ch('.'),
+                Line()));
+    }
+
+    Rule CodeBlock(){
+        return OneOrMore(Sequence(Ch('\t'),
+                Line()));
+    }
+
+    Rule Horizontale(){
+        return FirstOf(OneOrMore(Ch('*')),
+                OneOrMore(Ch('-')),
+                OneOrMore(Ch('*')));
+    }
 }
