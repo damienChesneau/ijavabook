@@ -19,18 +19,6 @@ public class PictureTag implements HtmlProducer {
         this.title = Objects.requireNonNull(title);
     }
 
-    /*public final String getAltText() {
-        return altText;
-    }
-
-    public final String getSrc() {
-        return src;
-    }
-
-    public String getTitle() {
-        return title;
-    }*/
-
     @Override
     public String toString() {
         return "Image [getContent=" + altText + ", getHref=" + src + ", title=" + title + "]";
