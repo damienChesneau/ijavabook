@@ -37,6 +37,8 @@ class JShellInterpreter implements Interpreter {
     @Override
     public String interpret(String line) {
         List<SnippetEvent> eval = jShell.eval(line);
+
+        System.out.println(eval.get(0).toString());
         return eval.get(0).value();
     }
     @Override
