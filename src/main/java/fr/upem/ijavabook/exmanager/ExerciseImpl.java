@@ -1,6 +1,7 @@
 package fr.upem.ijavabook.exmanager;
 
 import fr.upem.ijavabook.exmanager.parser.Parsers;
+import org.pegdown.PegDownProcessor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +18,7 @@ class ExerciseImpl implements ExerciseService {
         String line1 = "![Alt text]\n";
         String value = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
         Parsers.markdownToHtml(value);
-        return "<h1> Hello </h1>";
+        return new PegDownProcessor().markdownToHtml(value);
+//        return "<h1> Hello </h1>";
     }
 }
