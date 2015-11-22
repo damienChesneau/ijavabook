@@ -6,11 +6,9 @@ var sendedLines;
 if (window.WebSocket) {
     socket = new WebSocket("ws://localhost:8989/exercice");
     socket.onmessage = function (event) {
-        console.log(event.data);
         var recevedata = JSON.parse(event.data);
         switch (recevedata.t) {
             case "ex":
-                console.log("set ex");
                 $("#displayExercise").html(recevedata.m);
                 break;
             case "op":
