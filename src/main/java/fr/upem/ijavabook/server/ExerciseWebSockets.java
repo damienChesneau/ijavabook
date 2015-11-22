@@ -11,13 +11,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Define all request/responses to client and server for exercises socket.
+ *
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
 class ExerciseWebSockets {
@@ -39,6 +43,7 @@ class ExerciseWebSockets {
 
     /**
      * Start method to use when a new connection comes.
+     *
      * @param buf
      */
     public void start(Buffer buf) {
@@ -47,23 +52,52 @@ class ExerciseWebSockets {
     }
 
     private final String requerstAnExercice(TransactionParser<String> tp) {
-        String exercise = getExercise(tp.getMessage());
+        Path exerciseP = getExercicePath(tp.getMessage());
+        String exercise = getExercise(exerciseP);
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
+        manageUpdatesOfExercises(exerciseP, tp);
         return creator.toJson();
     }
 
     private final String requerstAnJavaCode(TransactionParser<String> tp) {
-        InterpretedLine interpret = interpreter.interpret(tp.getMessage());
+        List<InterpretedLine> interpret = interpreter.interpretAll(Arrays.asList(tp.getMessage().split("\\n")));
         String reduce = interpreter.getOutput().stream().collect(Collectors.joining("<br/>"));
         TransactionParser c = new TransactionParser.
-                BuilderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT,reduce)
-                .setInterpretedLine(interpret).build();
+                BuilderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT, reduce)
+                .setInterpretedLines(interpret).build();
         return c.toJson();
+    }
+
+    private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
+        Path p = exercice.getParent().toAbsolutePath();
+        Thread t = new Thread(watcher(p, sws, exercice, tp));
+        t.start();
+    }
+
+    private Runnable watcher(Path directory, ServerWebSocket sws, Path exercise, TransactionParser<String> tp) {
+        return () -> {
+            Watcher watcher = new Watcher(directory, false);
+            watcher.setOnUpdate(watcherOnExercice(sws, exercise, tp));
+            try {
+                watcher.start();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();//NO PROBEM.
+            }
+        };
+    }
+
+    private Consumer<String> watcherOnExercice(ServerWebSocket sws, Path exercise, TransactionParser<String> tp) {
+        return (filename) -> {
+            if (filename.equals(exercise.getFileName().toString())) {
+                sws.writeFinalTextFrame(requerstAnExercice(tp));
+            }
+        };
     }
 
     /**
      * To use for close interpreter instance.
-     * @param Void instance
+     *
+     * @param voiD instance
      * @return NPE
      */
     public ServerWebSocket onClose(Void voiD) {
@@ -71,13 +105,18 @@ class ExerciseWebSockets {
         return null;
     }
 
-    private String getExercise(String exerise) {
-        Path exercice = Paths.get("markdown/file" + exerise + ".text");//to update
+    private Path getExercicePath(String exercise) {
+        Path exercice = Paths.get("markdown/file" + exercise + ".text");//to update
         if (!Files.exists(exercice)) {
-            return "ERROR->USE OTHER EXERCISE.";
+            sws.writeFinalTextFrame("ERROR->USE OTHER EXERCISE.");
+            throw new AssertionError();
         }
+        return exercice;
+    }
+
+    private String getExercise(Path exercise) {
         try {
-            return Exercises.getExerciseSrv().getExercise(exercice);
+            return Exercises.getExerciseSrv().getExercise(exercise);
         } catch (IOException e) {
             return "ERRROR->RETRY";
         }

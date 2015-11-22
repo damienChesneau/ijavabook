@@ -6,27 +6,23 @@ var sendedLines;
 if (window.WebSocket) {
     socket = new WebSocket("ws://localhost:8989/exercice");
     socket.onmessage = function (event) {
-        console.log("Data from srv: " + event.data);
+        console.log(event.data);
         var recevedata = JSON.parse(event.data);
         switch (recevedata.t) {
             case "ex":
+                console.log("set ex");
                 $("#displayExercise").html(recevedata.m);
                 break;
             case "op":
                 var javaCode = $("#javacode").val();
                 var message = (recevedata.m);
-                console.log(message);
-                $("#console").append("<p style=\"color: " + ((message[1][1] == true) ? 'green' : 'red') + "\" >" + javaCode +
-                    ((message[1][1] == true && message[1][0] != "") ? " Expression value =" + message[1][0] : "") + "</p>");
-                $("#javacode").val("");
+                manageSingleLineConsole(message);
                 $("#output").html(message[0][0]);
                 break;
         }
     }
     socket.onopen = function (event) {
-        console.log("Web Socket OK");
         send(placeValueInReq("gete", "1"));
-
     };
     socket.onclose = function (event) {
         console.error("Web Socket closed :(");
@@ -49,13 +45,18 @@ function placeValueInReq(type, value) {
 }
 
 function sendJavaCode(code) {
-    //var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
-    var content = code.val();
-    //sendedLines
-    console.log(content);
+    var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
+    sendedLines = code.val().split("\n");
     send(placeValueInReq("jc", content));
 }
 
 function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
+}
+function manageSingleLineConsole(message) {
+    for (i = 1; i < message.length; i++) {
+        $("#console").append("<p style=\"color: " + ((message[i][1] == true) ? 'green' : 'red') + "\" >" + sendedLines[i - 1] +
+            ((message[1][1] == true && message[i][0] != "") ? " Expression value =" + message[i][0] : "") + "</p>");
+    }
+    $("#javacode").val("");
 }
