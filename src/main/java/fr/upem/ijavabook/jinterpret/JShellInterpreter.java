@@ -37,12 +37,12 @@ class JShellInterpreter implements Interpreter {
     @Override
     public String interpret(String line) {
         List<SnippetEvent> eval = jShell.eval(line);
-
-        System.out.println(eval.get(0).toString());
-        return eval.get(0).value();
+        String value = eval.get(0).value();
+        return value;
     }
+
     @Override
-    public List<String> getOutput(){
+    public List<String> getOutput() {
         try {
             return Files.readAllLines(pNominal);
         } catch (IOException e) {
@@ -60,7 +60,7 @@ class JShellInterpreter implements Interpreter {
     }
 
     @Override
-    public void close()  {
+    public void close() {
         jShell.close();
         sError.close();
         sNominal.close();

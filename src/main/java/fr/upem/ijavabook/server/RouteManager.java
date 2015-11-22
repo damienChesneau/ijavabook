@@ -27,24 +27,25 @@ class RouteManager extends AbstractVerticle {
      * Vertx is a super instance.
      */
     @Override
-    public void start()  {
+    public void start() {
         Router router = Router.router(vertx);
-        // route to JSON REST APIs
-        routes.forEach((routes) -> router.get(routes.getRoute()).handler(routes.getEvent()));
-        // otherwise serve static pages
-        router.route().handler(StaticHandler.create());
+        routes.forEach((routes) -> router.get(routes.getRoute()).handler(routes.getEvent())); // route to JSON REST APIs
+        router.route().handler(StaticHandler.create());// otherwise serve static pages
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.requestHandler(router::accept);
         httpServer.websocketHandler(RouteManager::webSocketExercise);
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-    static void webSocketExercise(ServerWebSocket sws) {
+
+    private static void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
-            sws.handler((buf) -> {
-                System.out.println(buf);
-                sws.writeFinalTextFrame("Hello");
+            Thread client = new Thread(() -> {
+                ExerciseWebSockets ews = new ExerciseWebSockets(sws);
+                sws.handler(ews::start);
+                sws.closeHandler(ews::onClose);
             });
+            client.start();
         }
     }
 
