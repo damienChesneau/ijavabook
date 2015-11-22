@@ -1,6 +1,7 @@
 package fr.upem.ijavabook.server;
 
 import fr.upem.ijavabook.exmanager.Exercises;
+import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
 import io.vertx.core.buffer.Buffer;
@@ -45,16 +46,18 @@ class ExerciseWebSockets {
         sws.writeFinalTextFrame(operations.get(tp.getType()).apply(tp));
     }
 
-    private final String requerstAnExercice(TransactionParser tp) {
+    private final String requerstAnExercice(TransactionParser<String> tp) {
         String exercise = getExercise(tp.getMessage());
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
         return creator.toJson();
     }
 
-    private final String requerstAnJavaCode(TransactionParser tp) {
-        interpreter.interpret(tp.getMessage());
+    private final String requerstAnJavaCode(TransactionParser<String> tp) {
+        InterpretedLine interpret = interpreter.interpret(tp.getMessage());
         String reduce = interpreter.getOutput().stream().collect(Collectors.joining("<br/>"));
-        TransactionParser c = new TransactionParser(TransactionPattern.RESPONSE_CODE_OUTPUT, reduce);
+        TransactionParser c = new TransactionParser.
+                BuilderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT,reduce)
+                .setInterpretedLine(interpret).build();
         return c.toJson();
     }
 

@@ -12,7 +12,7 @@ public interface Interpreter extends AutoCloseable {
      * @param line Java code.
      * @return Java result or exception.
      */
-    String interpret(String line);
+    InterpretedLine interpret(String line);
 
     /**
      * Same as interpret method but for many lines.
@@ -20,7 +20,7 @@ public interface Interpreter extends AutoCloseable {
      * @param lines of Java code.
      * @return Java result or exception.
      */
-    List<String> interpretAll(List<String> lines);
+    List<InterpretedLine> interpretAll(List<String> lines);
 
     /**
      * Get output of your code inserted.

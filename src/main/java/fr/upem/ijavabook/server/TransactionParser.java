@@ -1,28 +1,32 @@
 package fr.upem.ijavabook.server;
 
+import fr.upem.ijavabook.jinterpret.InterpretedLine;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Encapsulate your data to send a formatted response.
+ *
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
-class TransactionParser {
+class TransactionParser<T> {
     private final TransactionPattern type;
-    private final String message;
+    private final T message;
 
     /**
-     *
-     * @param type of transaction.
+     * @param type    of transaction.
      * @param message to send.
      */
-    TransactionParser(TransactionPattern type, String message) {
+    TransactionParser(TransactionPattern type, T message) {
         this.type = Objects.requireNonNull(type);
         this.message = Objects.requireNonNull(message);
     }
 
-    String getMessage() {
+    T getMessage() {
         return message;
     }
 
@@ -32,6 +36,7 @@ class TransactionParser {
 
     /**
      * Encode your instance to a json String.
+     *
      * @return Json data.
      */
     String toJson() {
@@ -43,6 +48,7 @@ class TransactionParser {
 
     /**
      * statc factory to parse your json object to POJO.
+     *
      * @param query
      * @return
      */
@@ -52,5 +58,58 @@ class TransactionParser {
         String tpAsStr = json.getString(TransactionPattern.TYPE_PATTERN.getTraduct());
         String message = json.getString(TransactionPattern.MESSAGE_PATTERN.getTraduct());
         return new TransactionParser(TransactionPattern.getByTraduction(tpAsStr), message);
+    }
+
+    static class BuilderJavaInterpreted {
+        private final TransactionPattern type;
+        private String message;
+        private List<InterpretedLine> ils;
+        private InterpretedLine il;
+        private String output;
+
+        BuilderJavaInterpreted(TransactionPattern type, String output) {
+            this.type = Objects.requireNonNull(type);
+            this.output = Objects.requireNonNull(output);
+        }
+
+        BuilderJavaInterpreted setMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+        BuilderJavaInterpreted setInterpretedLines(List<InterpretedLine> ils) {
+            this.ils = ils;
+            return this;
+        }
+
+        BuilderJavaInterpreted setInterpretedLine(InterpretedLine il) {
+            this.il = il;
+            return this;
+        }
+
+        private JsonArray jsonArrayForLine(InterpretedLine il) {
+            JsonArray ja = new JsonArray();
+            ja.add(il.getValue());
+            ja.add(il.isValid());
+            return ja.add(il.getException());
+        }
+
+        TransactionParser build() {
+            JsonArray ja = new JsonArray();
+            JsonArray jm = new JsonArray();
+            jm.add(output);
+            ja.add(jm);
+            if (message == null) {
+                if (il != null) {
+                    ja.add(jsonArrayForLine(il));
+                } else {
+                    List<JsonArray> str = ils.stream().map((li) -> jsonArrayForLine(li)).collect(Collectors.toList());
+                    str.forEach((item) -> ja.add(item));
+                }
+            } else {
+                ja.add(message);
+            }
+            return new TransactionParser(this.type, ja);
+        }
     }
 }

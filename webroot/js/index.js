@@ -2,26 +2,30 @@
  * Created by Damien Chesneau - contact@damienchesneau.fr on 08/11/15.
  */
 var socket;
+var sendedLines;
 if (window.WebSocket) {
     socket = new WebSocket("ws://localhost:8989/exercice");
     socket.onmessage = function (event) {
         console.log("Data from srv: " + event.data);
         var recevedata = JSON.parse(event.data);
-        switch (recevedata.t){
+        switch (recevedata.t) {
             case "ex":
                 $("#displayExercise").html(recevedata.m);
                 break;
             case "op":
                 var javaCode = $("#javacode").val();
-                $("#console").append("<p>"+javaCode+"</p>");
+                var message = (recevedata.m);
+                console.log(message);
+                $("#console").append("<p style=\"color: " + ((message[1][1] == true) ? 'green' : 'red') + "\" >" + javaCode +
+                    ((message[1][1] == true && message[1][0] != "") ? " Expression value =" + message[1][0] : "") + "</p>");
                 $("#javacode").val("");
-                $("#output").html(recevedata.m);
+                $("#output").html(message[0][0]);
                 break;
         }
     }
     socket.onopen = function (event) {
         console.log("Web Socket OK");
-        send(placeValueInReq("gete","1"));
+        send(placeValueInReq("gete", "1"));
 
     };
     socket.onclose = function (event) {
@@ -41,11 +45,15 @@ function send(message) {
     }
 }
 function placeValueInReq(type, value) {
-    return "{\"t\": \"" + type + "\", \"m\": \"" + replaceAll(value,"\"", "\\\"") + "\"}";
+    return "{\"t\": \"" + type + "\", \"m\": \"" + replaceAll(value, "\"", "\\\"") + "\"}";
 }
 
 function sendJavaCode(code) {
-    send(placeValueInReq("jc", code.val()));
+    //var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
+    var content = code.val();
+    //sendedLines
+    console.log(content);
+    send(placeValueInReq("jc", content));
 }
 
 function replaceAll(str, find, replace) {

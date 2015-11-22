@@ -15,7 +15,7 @@ public class JShellInterpreterTest {
     @Test
     public void returnOfIntegerInOutput() {
         try (Interpreter jsi = Interpreters.getJavaInterpreter()) {
-            List<String> interpret = jsi.interpretAll(Arrays.asList("int a = 2;", " System.out.println(a)"));
+            List<InterpretedLine> interpret = jsi.interpretAll(Arrays.asList("int a = 2;", " System.out.println(a)"));
             String out = (jsi.getOutput().stream().reduce("", (a, b) -> a + b));
             assertEquals(out, "2");
         }
@@ -24,7 +24,7 @@ public class JShellInterpreterTest {
     @Test
     public void returnOfIntegerInErrorOutput() {
         try (Interpreter jsi = Interpreters.getJavaInterpreter()) {
-            List<String> interpret = jsi.interpretAll(Arrays.asList("int a = 2;", " System.err.println(a)"));
+            List<InterpretedLine> interpret = jsi.interpretAll(Arrays.asList("int a = 2;", " System.err.println(a)"));
             String out = (jsi.getErrors().stream().reduce("", (a, b) -> a + b));
             assertEquals("2", out);
         }
@@ -33,7 +33,7 @@ public class JShellInterpreterTest {
     @Test
     public void arithmeticOp() {
         try (Interpreter jsi = Interpreters.getJavaInterpreter()) {
-            String interpret = jsi.interpret("int a = 22*4;");
+            InterpretedLine interpret = jsi.interpret("int a = 22*4;");
             System.out.println(interpret);
             assertEquals(String.valueOf(88), interpret);
         }

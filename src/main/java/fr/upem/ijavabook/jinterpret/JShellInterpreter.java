@@ -30,15 +30,17 @@ class JShellInterpreter implements Interpreter {
     }
 
     @Override
-    public List<String> interpretAll(List<String> lines) {
+    public List<InterpretedLine> interpretAll(List<String> lines) {
         return lines.stream().map((line) -> (interpret(line))).collect(Collectors.toList());
     }
 
     @Override
-    public String interpret(String line) {
+    public InterpretedLine interpret(String line) {
         List<SnippetEvent> eval = jShell.eval(line);
         String value = eval.get(0).value();
-        return value;
+        Exception e = eval.get(0).exception();
+        return new InterpretedLine(eval.get(0).value(), (e != null) ? e.toString() : "",
+                eval.get(0).status().name().equals("VALID"));
     }
 
     @Override
