@@ -40,12 +40,25 @@ class RouteManager extends AbstractVerticle {
 
     private static void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
-            Thread client = new Thread(() -> {
-                ExerciseWebSockets ews = new ExerciseWebSockets(sws);
-                sws.handler(ews::start);
-                sws.closeHandler(ews::onClose);
-            });
+            ExerciseWebSockets ews = new ExerciseWebSockets(sws);
+            Thread client = new Thread(new EncaplsulateWebSock(ews, sws));
             client.start();
+        }
+    }
+
+    private static class EncaplsulateWebSock implements Runnable {
+        private final ExerciseWebSockets ews;
+        private final ServerWebSocket sws;
+
+        public EncaplsulateWebSock(ExerciseWebSockets ews, ServerWebSocket sws) {
+            this.ews = Objects.requireNonNull(ews);
+            this.sws = Objects.requireNonNull(sws);
+        }
+
+        @Override
+        public void run() {
+            sws.handler(ews::start);
+            sws.closeHandler(ews::onClose);
         }
     }
 
