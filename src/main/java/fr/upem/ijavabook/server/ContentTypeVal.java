@@ -2,12 +2,11 @@ package fr.upem.ijavabook.server;
 
 /**
  * Represents content type values.
- * @author Damien Chesneau - contact@damienchesneau.fr
+ *
+ * @author Damien Chesneau
  */
 enum ContentTypeVal {
-    KEY_VALUE("content-type"),
-    APPLICATION_JSON("application/json"),
-    APPLICATION_XML("application/xml");
+    KEY_VALUE("content-type"), APPLICATION_JSON("application/json");
 
     private final String content;
 

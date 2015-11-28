@@ -3,19 +3,43 @@ package fr.upem.ijavabook;
 import fr.upem.ijavabook.server.Server;
 import fr.upem.ijavabook.server.Servers;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
+
 /**
  * JShell Book program input.
  *
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public class Main {
 
     private Main() {
     }
 
+    /**
+     * Input of program. No parameters needed.
+     *
+     * @param args not used
+     */
     public static void main(String[] args) {
-        Server srv = Servers.getServer();
+        Path markdownFolder = Paths.get(".").toAbsolutePath();
+        Server srv = Servers.getServer(markdownFolder);
         String start = srv.start();
         System.out.println("Server started on : " + start);
+        manageStop(srv);
     }
+
+    private static void manageStop(Server srv) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("For stop the server, press Q.");
+        while (input.hasNext()) {
+            if (input.next().equals("Q")) {
+                srv.stop();
+                input.close();
+                System.exit(0);
+            }
+        }
+    }
+
 }

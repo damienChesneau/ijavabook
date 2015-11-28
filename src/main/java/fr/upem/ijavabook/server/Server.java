@@ -1,12 +1,14 @@
 package fr.upem.ijavabook.server;
 
 /**
- * Do action in server.
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * Do simple action in server.
+ *
+ * @author Damien Chesneau
  */
 public interface Server {
     /**
      * Start server.
+     * @return URL to access to server.
      */
     String start();
 
