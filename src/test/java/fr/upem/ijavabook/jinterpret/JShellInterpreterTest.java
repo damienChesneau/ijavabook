@@ -35,7 +35,7 @@ public class JShellInterpreterTest {
         try (Interpreter jsi = Interpreters.getJavaInterpreter()) {
             InterpretedLine interpret = jsi.interpret("int a = 22*4;");
             System.out.println(interpret);
-            assertEquals(String.valueOf(88), interpret);
+            assertEquals(String.valueOf(88), interpret.getValue());
         }
     }
 

@@ -115,11 +115,7 @@ class ExerciseWebSockets {
     }
 
     private String getExercise(Path exercise) {
-        try {
-            return Exercises.getExerciseSrv().getExercise(exercise);
-        } catch (IOException e) {
-            return "ERRROR->RETRY";
-        }
+        return Exercises.getExerciseSrv().getExercise(exercise);
     }
 
 }
