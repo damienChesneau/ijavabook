@@ -14,7 +14,6 @@ class ExerciseImpl implements ExerciseService {
 
     @Override
     public String getExercise(Path file) throws IOException {
-        String line1 = "![Alt text]\n";
         String value = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
         return new PegDownProcessor().markdownToHtml(value);
     }
