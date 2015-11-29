@@ -17,12 +17,12 @@ public interface ExerciseService {
     String getExercise(Path file);
 
     /**
-     * Update and get the content of an exercise.
+     * Update the content of an exercise.
      *
      * @param java.nio.file.Path Path to text file.
-     * @return HTML representation.
+     * @return
      */
-    String updateAndGetExercise(Path file);
+    void updateExercise(Path file);
 
     List<Path> getAllByDirectory(Path path);
 }

@@ -24,10 +24,8 @@ class ExerciseImpl implements ExerciseService {
     }
 
     @Override
-    public String updateAndGetExercise(Path file) {
-        String html = getHtmlOfAnMarkdown(file);
-        htmlRepresentation.put(file,html);
-        return html;
+    public void updateExercise(Path file) {
+        htmlRepresentation.put(file,getHtmlOfAnMarkdown(file));
     }
 
     @Override

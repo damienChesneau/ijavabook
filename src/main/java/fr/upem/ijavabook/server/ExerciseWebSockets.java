@@ -90,6 +90,7 @@ class ExerciseWebSockets {
     private Consumer<String> watcherOnExercice(ServerWebSocket sws, Path exercise, TransactionParser<String> tp) {
         return (filename) -> {
             if (filename.equals(exercise.getFileName().toString())) {
+                openedExercices.updateExercise(exercise);
                 sws.writeFinalTextFrame(requerstAnExercice(tp));
             }
         };
