@@ -24,6 +24,13 @@ class ExerciseImpl implements ExerciseService {
     }
 
     @Override
+    public String updateAndGetExercise(Path file) {
+        String html = getHtmlOfAnMarkdown(file);
+        htmlRepresentation.put(file,html);
+        return html;
+    }
+
+    @Override
     public List<Path> getAllByDirectory(Path path) {
         try {
             return Files.list(path).collect(Collectors.toList());

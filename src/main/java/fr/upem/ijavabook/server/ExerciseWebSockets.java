@@ -1,6 +1,7 @@
 package fr.upem.ijavabook.server;
 
 import fr.upem.ijavabook.exmanager.Exercises;
+import fr.upem.ijavabook.exmanager.ExerciseService;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
@@ -31,7 +32,7 @@ class ExerciseWebSockets {
     private final HashMap<TransactionPattern, Function<TransactionParser, String>> operations = new HashMap<>();
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
-
+    private final ExerciseService openedExercices = Exercises.getExerciseSrv();
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
      */
@@ -115,7 +116,7 @@ class ExerciseWebSockets {
     }
 
     private String getExercise(Path exercise) {
-        return Exercises.getExerciseSrv().getExercise(exercise);
+        return openedExercices.getExercise(exercise);
     }
 
 }
