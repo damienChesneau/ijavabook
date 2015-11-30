@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ class ExerciseWebSockets {
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExerciseService openedExercices = Exercises.getExerciseSrv();
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
      */
@@ -48,8 +51,10 @@ class ExerciseWebSockets {
      * @param buf
      */
     public void start(Buffer buf) {
-        TransactionParser tp = TransactionParser.parse(String.valueOf(buf));
-        sws.writeFinalTextFrame(operations.get(tp.getType()).apply(tp));
+        threadPool.execute(()-> {
+            TransactionParser tp = TransactionParser.parse(String.valueOf(buf));
+            sws.writeFinalTextFrame(operations.get(tp.getType()).apply(tp));
+        });
     }
 
     private final String requerstAnExercice(TransactionParser<String> tp) {
