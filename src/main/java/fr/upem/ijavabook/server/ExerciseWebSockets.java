@@ -109,6 +109,7 @@ class ExerciseWebSockets {
      */
     public ServerWebSocket onClose(Void voiD) {
         interpreter.close();
+        threadPool.shutdown();
         return null;
     }
 
