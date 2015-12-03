@@ -34,7 +34,6 @@ class ExerciseWebSockets {
     private final HashMap<TransactionPattern, Function<TransactionParser, String>> operations = new HashMap<>();
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
-    private final ExerciseService openedExercices = Exercises.getExerciseSrv();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
@@ -61,7 +60,7 @@ class ExerciseWebSockets {
         Path exerciseP = getExercicePath(tp.getMessage());
         String exercise = getExercise(exerciseP);
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
-        manageUpdatesOfExercises(exerciseP, tp);
+        //manageUpdatesOfExercises(exerciseP, tp);
         return creator.toJson();
     }
 
@@ -74,7 +73,8 @@ class ExerciseWebSockets {
         return c.toJson();
     }
 
-    private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
+   /*
+   private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
         Path p = exercice.getParent().toAbsolutePath();
         Thread t = new Thread(watcher(p, sws, exercice, tp));
         t.start();
@@ -100,6 +100,7 @@ class ExerciseWebSockets {
             }
         };
     }
+    */
 
     /**
      * To use for close interpreter instance.
@@ -123,7 +124,7 @@ class ExerciseWebSockets {
     }
 
     private String getExercise(Path exercise) {
-        return openedExercices.getExercise(exercise);
+        return Exercises.getExerciseSrv().getExercise(exercise);
     }
 
 }

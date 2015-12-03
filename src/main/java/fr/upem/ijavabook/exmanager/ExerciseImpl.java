@@ -5,8 +5,11 @@ import org.pegdown.PegDownProcessor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -16,16 +19,20 @@ import java.util.stream.Collectors;
  */
 class ExerciseImpl implements ExerciseService {
 
-    private final HashMap<Path, String> htmlRepresentation = new HashMap<>();
+    private final HashMap<String, String> htmlRepresentation = new HashMap<>();
+    private final String directoryPath;
 
-    @Override
-    public String getExercise(Path file) {
-        return htmlRepresentation.computeIfAbsent(file, this::getHtmlOfAnMarkdown);
+    ExerciseImpl(String directoryPath){
+        this.directoryPath = Objects.requireNonNull(directoryPath);
     }
 
     @Override
-    public void updateExercise(Path file) {
-        htmlRepresentation.put(file,getHtmlOfAnMarkdown(file));
+    public String getExercise(Path file) {
+        return htmlRepresentation.computeIfAbsent(file.toString(), this::getHtmlOfAnMarkdown);
+    }
+
+    public void updateExercise(String file) {
+        htmlRepresentation.computeIfPresent(file,(key,value)->getHtmlOfAnMarkdown(file));
     }
 
     @Override
@@ -38,12 +45,31 @@ class ExerciseImpl implements ExerciseService {
         }
     }
 
-    private String getHtmlOfAnMarkdown(Path file) {
+    private String getHtmlOfAnMarkdown(String file) {
         try {
-            String value = Files.readAllLines(file).stream().collect(Collectors.joining("\n"));
+            String value = Files.readAllLines(Paths.get(file)).stream().collect(Collectors.joining("\n"));
             return new PegDownProcessor().markdownToHtml(value);
         } catch (IOException e) {
             throw new AssertionError();
         }
+    }
+/*
+    private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
+        Path p = exercice.getParent().toAbsolutePath();
+        Thread t = new Thread(watcher(p, sws, exercice, tp));
+        t.start();
+    }
+    */
+    Thread start() {
+        Thread t = new Thread(() -> {
+            Watcher watcher = new Watcher(Paths.get(directoryPath), false);
+           watcher.setOnUpdate((str)-> updateExercise(str));
+            try {
+                watcher.start();
+            } catch (IOException | InterruptedException e) {
+            }
+        });
+        t.start();
+        return t;
     }
 }

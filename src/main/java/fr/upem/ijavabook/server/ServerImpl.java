@@ -4,6 +4,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Implentation how controls all of server flux.
@@ -13,15 +14,17 @@ import java.util.ArrayList;
 class ServerImpl implements Server {
 
     private final Vertx web_srv = Vertx.vertx();
+    private final String directoryPath;
 
-    public ServerImpl() {
+    ServerImpl(String directoryPath) {
         System.setProperty("vertx.disableFileCaching", "true");//DEV
+        this.directoryPath = Objects.requireNonNull(directoryPath);
     }
 
     @Override
     public String start() {
         ArrayList<Route> routes = new ArrayList<>();
-        routes.add(new Route("/exercise/:id", ServerImpl::getExerciceHandle));
+        routes.add(new Route(directoryPath, ServerImpl::getExerciceHandle));
         web_srv.deployVerticle(new RouteManager(routes));
         return "http://localhost:" + Servers.SERVER_PORT + "/";
     }

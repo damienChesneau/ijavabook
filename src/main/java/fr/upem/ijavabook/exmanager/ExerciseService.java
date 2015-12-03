@@ -15,14 +15,14 @@ public interface ExerciseService {
      * @return HTML representation.
      */
     String getExercise(Path file);
-
+/*
     /**
      * Update the content of an exercise.
      *
      * @param java.nio.file.Path Path to text file.
      * @return
-     */
-    void updateExercise(Path file);
+
+    void updateExercise(Path file);*/
 
     List<Path> getAllByDirectory(Path path);
 }
