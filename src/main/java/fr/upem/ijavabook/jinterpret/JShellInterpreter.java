@@ -21,12 +21,12 @@ class JShellInterpreter implements Interpreter {
     private final PrintStream sError;
     private final JShell jShell;
 
-    JShellInterpreter(Path pNominal, Path pError, PrintStream sNominal, PrintStream sError, JShell jShell) {
+    JShellInterpreter(Path pNominal, Path pError, PrintStream sNominal, PrintStream sError) {
         this.pNominal = Objects.requireNonNull(pNominal);
         this.pError = Objects.requireNonNull(pError);
         this.sNominal = Objects.requireNonNull(sNominal);
         this.sError = Objects.requireNonNull(sError);
-        this.jShell = Objects.requireNonNull(jShell);
+        this.jShell = JShell.builder().out(sNominal).err(sError).build();
     }
 
     @Override

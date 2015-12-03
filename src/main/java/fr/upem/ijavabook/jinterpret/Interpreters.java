@@ -1,7 +1,5 @@
 package fr.upem.ijavabook.jinterpret;
 
-import jdk.jshell.JShell;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -21,8 +19,7 @@ public class Interpreters {
             Path tmpErrFile = Files.createTempFile("tmp", ".err.jshell");
             PrintStream sNominal = new PrintStream(Files.newOutputStream(tmpFile));
             PrintStream sError = new PrintStream(Files.newOutputStream(tmpErrFile));
-            JShell build = JShell.builder().out(sNominal).err(sError).build();
-            return new JShellInterpreter(tmpFile, tmpErrFile, sNominal, sError, build);
+            return new JShellInterpreter(tmpFile, tmpErrFile, sNominal, sError);
         } catch (IOException e) {
             throw new Error("Unable to get Java interpreter :(");
         }
