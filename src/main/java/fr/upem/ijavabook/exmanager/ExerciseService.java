@@ -1,6 +1,5 @@
 package fr.upem.ijavabook.exmanager;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Observer;
@@ -29,5 +28,5 @@ public interface ExerciseService {
      */
     void removeObserver(Observer observer);
 
-    //List<Path> getAllByDirectory(Path path);
+    List<Path> getAllByDirectory(Path path);
 }

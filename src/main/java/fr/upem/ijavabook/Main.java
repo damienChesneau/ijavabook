@@ -1,5 +1,6 @@
 package fr.upem.ijavabook;
 
+import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.server.Server;
 import fr.upem.ijavabook.server.Servers;
 
@@ -18,6 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
         Path markdownFolder = Paths.get("markdown").toAbsolutePath();//TO BE UPDATE IN PROD
+        Exercises.start(markdownFolder);
         Server srv = Servers.getServer(markdownFolder);
         String start = srv.start();
         System.out.println("Server started on : " + start);

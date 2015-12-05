@@ -1,12 +1,13 @@
 package fr.upem.ijavabook.server;
 
-
 import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
+
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,6 +27,7 @@ class ExerciseWebSockets {
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private final Path rootDirectory;
     private final Observer observer = new Observer() {
         @Override
         public void update(Observable o, Object arg) {
@@ -36,7 +38,8 @@ class ExerciseWebSockets {
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
      */
-    ExerciseWebSockets(ServerWebSocket sws) {
+    ExerciseWebSockets(ServerWebSocket sws, Path rootDirectory) {
+        this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.sws = Objects.requireNonNull(sws);
         this.operations.put(TransactionPattern.REQUEST_ASK_EXERCISE, this::requerstAnExercice);
         this.operations.put(TransactionPattern.REQUEST_JAVA_CODE, this::requerstAnJavaCode);
@@ -48,7 +51,7 @@ class ExerciseWebSockets {
      * @param buf
      */
     public void start(Buffer buf) {
-        threadPool.execute(()-> {
+        threadPool.execute(() -> {
             TransactionParser tp = TransactionParser.parse(String.valueOf(buf));
             sws.writeFinalTextFrame(operations.get(tp.getType()).apply(tp));
         });
@@ -57,7 +60,6 @@ class ExerciseWebSockets {
     final String requerstAnExercice(TransactionParser<String> tp) {
         String exercise = getExercise(getExercicePath(tp.getMessage()));
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
-        //manageUpdatesOfExercises(exerciseP, tp);
         return creator.toJson();
     }
 
@@ -84,9 +86,8 @@ class ExerciseWebSockets {
     }
 
     private String getExercicePath(String exercise) {
-        return "markdown/file" + exercise + ".text";
+        return rootDirectory.resolve(exercise).normalize().toString();
     }
-
     private String getExercise(String exercise) {
         return Exercises.getExerciseSrv().getExercise(exercise,observer);
     }

@@ -21,12 +21,18 @@ import java.util.stream.Collectors;
 class ExerciseImpl implements ExerciseService {
 
     private final HashMap<String, HtmlObservable> htmlRepresentation = new HashMap<>();
+    private final Path rootDirectory;
     private final Object monitor = new Object();
+
+    ExerciseImpl(Path rootDirectory){
+        Objects.requireNonNull(rootDirectory);
+        this.rootDirectory = rootDirectory;
+    }
 
     @Override
     public String getExercise(String file, Observer observer) {
         synchronized (monitor) {
-            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file, (str) -> new HtmlObservable(getHtmlOfAMarkdown(str)));
+            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file+".text", (str) -> new HtmlObservable(getHtmlOfAMarkdown(str)));
             observable.addObserver(observer);
             return observable.getHtml();
         }
@@ -34,14 +40,18 @@ class ExerciseImpl implements ExerciseService {
 
     public void updateExercise(String file) {
         synchronized (monitor) {
-            htmlRepresentation.computeIfPresent("markdown/"+file, (key, value) -> {
+            htmlRepresentation.computeIfPresent(getPath(file), (key, value) -> {
                 value.setHtmlTraduction(getHtmlOfAMarkdown(key));
                 return value;
             });
         }
     }
 
-   /* @Override
+    private String getPath(String file){
+        return rootDirectory.resolve(file).normalize().toString();
+    }
+
+    @Override
     public List<Path> getAllByDirectory(Path path) {
         try {
             return Files.list(path).collect(Collectors.toList());
@@ -49,7 +59,7 @@ class ExerciseImpl implements ExerciseService {
             Logger.getLogger(ExerciseImpl.class.getName()).log(Level.SEVERE, "Can't get all paths.");
             throw new AssertionError();
         }
-    }*/
+    }
 
     private String getHtmlOfAMarkdown(String file) {
         try {
@@ -63,7 +73,7 @@ class ExerciseImpl implements ExerciseService {
     @Override
     public Thread start() {
         Thread t = new Thread(()-> {
-            Watcher watcher = new Watcher(Paths.get("markdown/"), false);
+            Watcher watcher = new Watcher(rootDirectory, false);
             watcher.setOnUpdate(this::updateExercise);
             try {
                 watcher.start();
