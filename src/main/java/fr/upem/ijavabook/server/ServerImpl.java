@@ -1,5 +1,7 @@
 package fr.upem.ijavabook.server;
 
+import fr.upem.ijavabook.exmanager.ExerciseService;
+import fr.upem.ijavabook.exmanager.Exercises;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
@@ -14,22 +16,27 @@ import java.util.Objects;
 class ServerImpl implements Server {
 
     private final Vertx web_srv = Vertx.vertx();
-    private final String directoryPath;
+    private final ExerciseService exerciceManager = Exercises.getExerciseSrv();
 
-    ServerImpl(String directoryPath) {
+    ServerImpl() {
         System.setProperty("vertx.disableFileCaching", "true");//DEV
-        this.directoryPath = Objects.requireNonNull(directoryPath);
     }
 
     @Override
     public String start() {
         ArrayList<Route> routes = new ArrayList<>();
-        routes.add(new Route(directoryPath, ServerImpl::getExerciceHandle));
+        routes.add(new Route("/exercise/:id", ServerImpl::getExerciceHandle));
         web_srv.deployVerticle(new RouteManager(routes));
+        exerciceManager.start();
         return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
-    public static void getExerciceHandle(RoutingContext rc) {
+    @Override
+    public String getExercise(String name) {
+        return null;
+    }
+
+    private static void getExerciceHandle(RoutingContext rc) {
         String id = rc.request().getParam("id");
         System.out.println(id);
         rc.response()

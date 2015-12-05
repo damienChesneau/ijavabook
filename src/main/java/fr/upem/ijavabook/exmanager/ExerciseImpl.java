@@ -20,22 +20,22 @@ import java.util.stream.Collectors;
 class ExerciseImpl implements ExerciseService {
 
     private final HashMap<String, String> htmlRepresentation = new HashMap<>();
-    private final String directoryPath;
-
-    ExerciseImpl(String directoryPath){
-        this.directoryPath = Objects.requireNonNull(directoryPath);
-    }
+    private final Object monitor = new Object();
 
     @Override
-    public String getExercise(Path file) {
-        return htmlRepresentation.computeIfAbsent(file.toString(), this::getHtmlOfAnMarkdown);
+    public String getExercise(String file) {
+        synchronized (monitor) {
+            return htmlRepresentation.computeIfAbsent(file, this::getHtmlOfAnMarkdown);
+        }
     }
 
     public void updateExercise(String file) {
-        htmlRepresentation.computeIfPresent(file,(key,value)->getHtmlOfAnMarkdown(file));
+        synchronized (monitor) {
+            htmlRepresentation.computeIfPresent(file, (key, value) -> getHtmlOfAnMarkdown(file));
+        }
     }
 
-    @Override
+   /* @Override
     public List<Path> getAllByDirectory(Path path) {
         try {
             return Files.list(path).collect(Collectors.toList());
@@ -43,33 +43,24 @@ class ExerciseImpl implements ExerciseService {
             Logger.getLogger(ExerciseImpl.class.getName()).log(Level.SEVERE, "Can't get all paths.");
             throw new AssertionError();
         }
-    }
+    }*/
 
     private String getHtmlOfAnMarkdown(String file) {
         try {
-            String value = Files.readAllLines(Paths.get(file)).stream().collect(Collectors.joining("\n"));
+            String value = Files.readAllLines(Paths.get("markdown/file"+file+".text")).stream().collect(Collectors.joining("\n"));
             return new PegDownProcessor().markdownToHtml(value);
         } catch (IOException e) {
             throw new AssertionError();
         }
     }
-/*
-    private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
-        Path p = exercice.getParent().toAbsolutePath();
-        Thread t = new Thread(watcher(p, sws, exercice, tp));
-        t.start();
-    }
-    */
-    Thread start() {
-        Thread t = new Thread(() -> {
-            Watcher watcher = new Watcher(Paths.get(directoryPath), false);
-           watcher.setOnUpdate((str)-> updateExercise(str));
-            try {
-                watcher.start();
-            } catch (IOException | InterruptedException e) {
-            }
-        });
-        t.start();
-        return t;
+
+    @Override
+    public void start() {
+        Watcher watcher = new Watcher(Paths.get("markdown/"), false);
+        watcher.setOnUpdate((str)-> updateExercise(str));
+        try {
+            watcher.start();
+        } catch (IOException | InterruptedException e) {
+        }
     }
 }

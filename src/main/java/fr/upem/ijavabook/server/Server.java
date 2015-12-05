@@ -10,6 +10,15 @@ public interface Server {
      */
     String start();
 
+
+    /**
+     * Ask an exercise to the server.
+     *
+     * @param name of the exercise
+     * @return html of the exercise
+     */
+    String getExercise(String name);
+
     /**
      * Stop server.
      */

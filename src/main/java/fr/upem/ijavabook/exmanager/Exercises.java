@@ -5,8 +5,8 @@ package fr.upem.ijavabook.exmanager;
  */
 public class Exercises {
 
-    private static final ExerciseImpl EXERCICE_INSTANCE = new ExerciseImpl("/exercise/:id");
-    private static final Thread WATCHER_THREAD = EXERCICE_INSTANCE.start();
+    /*private static final ExerciseImpl EXERCICE_INSTANCE = new ExerciseImpl();
+    private static final Thread WATCHER_THREAD = EXERCICE_INSTANCE.start();*/
     private Exercises() {
     }
 
@@ -15,6 +15,6 @@ public class Exercises {
      * @return An implementation to get your exercices.
      */
     public static ExerciseService getExerciseSrv() {
-        return EXERCICE_INSTANCE;
+        return new ExerciseImpl();
     }
 }

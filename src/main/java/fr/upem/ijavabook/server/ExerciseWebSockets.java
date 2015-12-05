@@ -57,8 +57,8 @@ class ExerciseWebSockets {
     }
 
     private final String requerstAnExercice(TransactionParser<String> tp) {
-        Path exerciseP = getExercicePath(tp.getMessage());
-        String exercise = getExercise(exerciseP);
+        //Path exerciseP = getExercicePath(tp.getMessage());
+        String exercise = getExercise(tp.getMessage());
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
         //manageUpdatesOfExercises(exerciseP, tp);
         return creator.toJson();
@@ -114,17 +114,17 @@ class ExerciseWebSockets {
         return null;
     }
 
-    private Path getExercicePath(String exercise) {
+   /* private Path getExercicePath(String exercise) {
         Path exercice = Paths.get("markdown/file" + exercise + ".text");//to update
         if (!Files.exists(exercice)) {
             sws.writeFinalTextFrame("ERROR->USE OTHER EXERCISE.");
             throw new AssertionError();
         }
         return exercice;
-    }
+    }*/
 
-    private String getExercise(Path exercise) {
-        return Exercises.getExerciseSrv().getExercise(exercise);
+    private String getExercise(String exercise) {
+        return Servers.getServer().getExercise(exercise);
     }
 
 }

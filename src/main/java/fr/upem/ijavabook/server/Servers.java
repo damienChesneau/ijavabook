@@ -10,7 +10,7 @@ public class Servers {
      * Port of the server listening.
      */
     static final int SERVER_PORT = 8989;
-    private static final Server SERVER_INSTANCE = new ServerImpl("/exercise/:id"); // Must be modify !!!
+    private static final Server SERVER_INSTANCE = new ServerImpl(); // Must be modify !!!
 
     private Servers() {
     }
@@ -20,7 +20,7 @@ public class Servers {
      *
      * @return a singleton of server controls.
      */
-    public static Server getServer(String directoryPath) {
+    public static Server getServer() {
         return SERVER_INSTANCE;
     }
 

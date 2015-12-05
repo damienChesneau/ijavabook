@@ -14,7 +14,13 @@ public interface ExerciseService {
      * @param java.nio.file.Path Path to text file.
      * @return HTML representation.
      */
-    String getExercise(Path file);
+    String getExercise(String file);
+
+
+    /**
+     * Start the watcher on the repertory.
+     */
+    void start();
 /*
     /**
      * Update the content of an exercise.
@@ -24,5 +30,5 @@ public interface ExerciseService {
 
     void updateExercise(Path file);*/
 
-    List<Path> getAllByDirectory(Path path);
+    //List<Path> getAllByDirectory(Path path);
 }

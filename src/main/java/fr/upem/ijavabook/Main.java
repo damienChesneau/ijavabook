@@ -14,7 +14,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Server srv = Servers.getServer("/exercise/:id");
+        Server srv = Servers.getServer();
         String start = srv.start();
         System.out.println("Server started on : " + start);
     }
