@@ -112,4 +112,25 @@ class TransactionParser<T> {
             return new TransactionParser(this.type, ja);
         }
     }
+
+    static class BuilderJavaList<E> {
+        private final TransactionPattern type;
+        private List<E> genericList;
+
+        BuilderJavaList(TransactionPattern type) {
+            this.type = Objects.requireNonNull(type);
+        }
+
+        BuilderJavaList<E> setList(List<E> genericList) {
+            this.genericList = Objects.requireNonNull(genericList);
+            return this;
+        }
+
+        TransactionParser<JsonArray> build() {
+            JsonArray arrayAsJson = new JsonArray();
+            genericList.forEach((itemGeneric) -> arrayAsJson.add(itemGeneric));
+            return new TransactionParser(this.type, arrayAsJson);
+        }
+    }
+
 }

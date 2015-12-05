@@ -6,6 +6,7 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -18,8 +19,10 @@ import java.util.Objects;
 class RouteManager extends AbstractVerticle {
 
     private final List<Route> routes;
+    private final Path rootDirectory;
 
-    RouteManager(List<Route> routes) {
+    RouteManager(List<Route> routes, Path rootDirectory) {
+        this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
     }
 
@@ -39,7 +42,7 @@ class RouteManager extends AbstractVerticle {
 
     private void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
-            ExerciseWebSockets ews = new ExerciseWebSockets(sws);
+            ExerciseWebSockets ews = new ExerciseWebSockets(sws, rootDirectory);
             sws.handler(ews::start);
             sws.closeHandler(ews::onClose);
         }

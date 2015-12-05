@@ -1,5 +1,7 @@
 package fr.upem.ijavabook.server;
 
+import java.nio.file.Path;
+
 /**
  * Static factory class.
  *
@@ -10,7 +12,7 @@ public class Servers {
      * Port of the server listening.
      */
     static final int SERVER_PORT = 8989;
-    private static Server SERVER_INSTANCE = new ServerImpl();
+    private static Server SERVER_INSTANCE ;
 
     private Servers() {
     }
@@ -20,7 +22,10 @@ public class Servers {
      *
      * @return a singleton of server controls.
      */
-    public static Server getServer() {
+    public static Server getServer(Path rootDirectory) {
+        if(SERVER_INSTANCE == null){
+           SERVER_INSTANCE = new ServerImpl(rootDirectory);
+        }
         return SERVER_INSTANCE;
     }
 

@@ -1,7 +1,7 @@
 package fr.upem.ijavabook.server;
 
-import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.exmanager.ExerciseService;
+import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
@@ -9,9 +9,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +34,13 @@ class ExerciseWebSockets {
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExerciseService openedExercices = Exercises.getExerciseSrv();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private final Path rootDirectory;
+
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
      */
-    ExerciseWebSockets(ServerWebSocket sws) {
+    ExerciseWebSockets(ServerWebSocket sws, Path rootDirectory) {
+        this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.sws = Objects.requireNonNull(sws);
         this.operations.put(TransactionPattern.REQUEST_ASK_EXERCISE, this::requerstAnExercice);
         this.operations.put(TransactionPattern.REQUEST_JAVA_CODE, this::requerstAnJavaCode);
@@ -51,14 +52,15 @@ class ExerciseWebSockets {
      * @param buf
      */
     public void start(Buffer buf) {
-        threadPool.execute(()-> {
+        threadPool.execute(() -> {
             TransactionParser tp = TransactionParser.parse(String.valueOf(buf));
             sws.writeFinalTextFrame(operations.get(tp.getType()).apply(tp));
         });
     }
 
     private final String requerstAnExercice(TransactionParser<String> tp) {
-        Path exerciseP = getExercicePath(tp.getMessage());
+        String message = tp.getMessage() + ".text";
+        Path exerciseP = getExercicePath(message);
         String exercise = getExercise(exerciseP);
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
         manageUpdatesOfExercises(exerciseP, tp);
@@ -75,6 +77,7 @@ class ExerciseWebSockets {
     }
 
     private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
+        Path parent = exercice.getParent();
         Path p = exercice.getParent().toAbsolutePath();
         Thread t = new Thread(watcher(p, sws, exercice, tp));
         t.start();
@@ -87,7 +90,7 @@ class ExerciseWebSockets {
             try {
                 watcher.start();
             } catch (IOException | InterruptedException e) {
-                e.printStackTrace();//NO PROBEM.
+                return; //NO PROBEM.
             }
         };
     }
@@ -110,16 +113,11 @@ class ExerciseWebSockets {
     public ServerWebSocket onClose(Void voiD) {
         interpreter.close();
         threadPool.shutdown();
-        return null;
+        return sws;
     }
 
     private Path getExercicePath(String exercise) {
-        Path exercice = Paths.get("markdown/file" + exercise + ".text");//to update
-        if (!Files.exists(exercice)) {
-            sws.writeFinalTextFrame("ERROR->USE OTHER EXERCISE.");
-            throw new AssertionError();
-        }
-        return exercice;
+        return rootDirectory.resolve(exercise).normalize();
     }
 
     private String getExercise(Path exercise) {

@@ -1,60 +1,26 @@
 /**
- * Created by Damien Chesneau - contact@damienchesneau.fr on 08/11/15.
+ * Created by damien on 05/12/15.
  */
-var socket;
-var sendedLines;
-if (window.WebSocket) {
-    socket = new WebSocket("ws://localhost:8989/exercice");
-    socket.onmessage = function (event) {
-        var recevedata = JSON.parse(event.data);
-        switch (recevedata.t) {
-            case "ex":
-                $("#displayExercise").html(recevedata.m);
-                break;
-            case "op":
-                var javaCode = $("#javacode").val();
-                var message = (recevedata.m);
-                manageSingleLineConsole(message);
-                $("#output").html(message[0][0]);
-                break;
-        }
-    }
-    socket.onopen = function (event) {
-        send(placeValueInReq("gete", "1"));
-    };
-    socket.onclose = function (event) {
-        console.error("Web Socket closed :(");
-    };
-} else {
-    console.log("Your browser does not support Websockets :(");
-}
-function send(message) {
-    if (!window.WebSocket) {
-        return;
-    }
-    if (socket.readyState == WebSocket.OPEN) {
-        socket.send(message);
-    } else {
-        console.error("The socket is not opened");
-    }
-}
-function placeValueInReq(type, value) {
-    return "{\"t\": \"" + type + "\", \"m\": \"" + replaceAll(value, "\"", "\\\"") + "\"}";
-}
+$.ajax({
+    method: "GET",
+    url: "/getallexercices",
+}).done(function (msg) {
+    diplayExercises(msg.m);
+});
 
-function sendJavaCode(code) {
-    var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
-    sendedLines = code.val().split("\n");
-    send(placeValueInReq("jc", content));
-}
-
-function replaceAll(str, find, replace) {
-    return str.replace(new RegExp(find, 'g'), replace);
-}
-function manageSingleLineConsole(message) {
-    for (i = 1; i < message.length; i++) {
-        $("#console").append("<p style=\"color: " + ((message[i][1] == true) ? 'green' : 'red') + "\" >" + sendedLines[i - 1] +
-            ((message[1][1] == true && message[i][0] != "") ? " Expression value =" + message[i][0] : "") + "</p>");
+function diplayExercises(allExoIntab) {
+    var va = Math.floor((Math.random() * 10) + 1) % allExoIntab.length;
+    console.log(va);
+    $("#randomex").attr("href", "play.html?value=" + allExoIntab[va]);
+    var secondtab = allExoIntab.splice(0, allExoIntab.length / 2);
+    var thirdtab = allExoIntab.splice((allExoIntab.length / 2) - 1, allExoIntab.length);
+    for (i = 0; i < secondtab.length; i++) {
+        appendMessage("listeex1", secondtab[i]);
     }
-    $("#javacode").val("");
+    for (i = 0; i < thirdtab.length; i++) {
+        appendMessage("listeex2", thirdtab[i]);
+    }
+}
+function appendMessage(divid, filename) {
+    $("#" + divid).append(" \<h4>" + filename + "\</h4><p><a href=\"play.html?value=" + filename + "\"\>Do this exercise</a></p>");
 }

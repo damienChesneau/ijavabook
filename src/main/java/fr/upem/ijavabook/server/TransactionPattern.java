@@ -9,7 +9,7 @@ import java.util.Optional;
  */
 enum TransactionPattern {
     TYPE_PATTERN("t"), MESSAGE_PATTERN("m"), REQUEST_JAVA_CODE("jc"), REQUEST_ASK_EXERCISE("gete"),
-    RESPONSE_EXERCISE("ex"), RESPONSE_CODE_OUTPUT("op");
+    RESPONSE_EXERCISE("ex"), RESPONSE_CODE_OUTPUT("op"), RESPONSE_GET_ALL("rga");
     private String traduct;//Is a little expression to create little json Objects. This is faster.
 
     TransactionPattern(String traduct) {
@@ -32,7 +32,7 @@ enum TransactionPattern {
         if(!oTP.isPresent()){
             throw new IllegalArgumentException("Please send a real type in parameter.");
         }
-        return oTP.get();
+        return oTP.get();// TO REFORMAT
     }
 
 }

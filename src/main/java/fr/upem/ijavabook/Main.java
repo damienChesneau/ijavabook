@@ -3,6 +3,9 @@ package fr.upem.ijavabook;
 import fr.upem.ijavabook.server.Server;
 import fr.upem.ijavabook.server.Servers;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * JShell Book program input.
  *
@@ -14,7 +17,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Server srv = Servers.getServer();
+        Path markdownFolder = Paths.get("markdown").toAbsolutePath();//TO BE UPDATE IN PROD
+        Server srv = Servers.getServer(markdownFolder);
         String start = srv.start();
         System.out.println("Server started on : " + start);
     }
