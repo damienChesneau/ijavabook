@@ -1,4 +1,4 @@
-package fr.upem.ijavabook.server;
+package fr.upem.ijavabook.exmanager;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -70,7 +70,7 @@ class Watcher {
         });
         consumer.accept(event.context().toString());
     }
-
+/*
     public static void main(String[] args) {
         try {
             Watcher w = new Watcher(Paths.get("/home/damien/"), false);
@@ -81,4 +81,5 @@ class Watcher {
         } catch (InterruptedException e) {
         }
     }
+    */
 }

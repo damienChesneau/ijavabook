@@ -6,10 +6,7 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Manage all routes.
@@ -19,10 +16,8 @@ import java.util.Objects;
 class RouteManager extends AbstractVerticle {
 
     private final List<Route> routes;
-    private final Path rootDirectory;
 
-    RouteManager(List<Route> routes, Path rootDirectory) {
-        this.rootDirectory = Objects.requireNonNull(rootDirectory);
+    RouteManager(List<Route> routes) {
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
     }
 
@@ -36,16 +31,34 @@ class RouteManager extends AbstractVerticle {
         router.route().handler(StaticHandler.create());// otherwise serve static pages
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.requestHandler(router::accept);
-        httpServer.websocketHandler(this::webSocketExercise);
+        httpServer.websocketHandler(RouteManager::webSocketExercise);
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-    private void webSocketExercise(ServerWebSocket sws) {
+
+    private static void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
-            ExerciseWebSockets ews = new ExerciseWebSockets(sws, rootDirectory);
+            ExerciseWebSockets ews = new ExerciseWebSockets(sws);
+            Thread client = new Thread(new EncaplsulateWebSock(ews, sws));
+            client.start();
+        }
+    }
+
+    private static class EncaplsulateWebSock implements Runnable {
+        private final ExerciseWebSockets ews;
+        private final ServerWebSocket sws;
+
+        public EncaplsulateWebSock(ExerciseWebSockets ews, ServerWebSocket sws) {
+            this.ews = Objects.requireNonNull(ews);
+            this.sws = Objects.requireNonNull(sws);
+        }
+
+        @Override
+        public void run() {
             sws.handler(ews::start);
             sws.closeHandler(ews::onClose);
         }
+
     }
 
 }
