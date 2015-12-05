@@ -22,14 +22,12 @@ public interface ExerciseService {
      * Start the watcher on the repertory.
      */
     Thread start();
-/*
-    /**
-     * Update the content of an exercise.
-     *
-     * @param java.nio.file.Path Path to text file.
-     * @return
 
-    void updateExercise(Path file);*/
+    /**
+     * Remove an observer from the data map.
+     * @param observer
+     */
+    void removeObserver(Observer observer);
 
     //List<Path> getAllByDirectory(Path path);
 }

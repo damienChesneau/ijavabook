@@ -18,7 +18,8 @@ class HtmlObservable extends Observable{
     void setHtmlTraduction(String str){
         Objects.requireNonNull(str);
         htmlTraduction = str;
-        notifyObservers(str);
+        setChanged();
+        notifyObservers(htmlTraduction);
     }
 
     String getHtml(){

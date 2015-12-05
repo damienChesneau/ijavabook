@@ -74,4 +74,9 @@ class ExerciseImpl implements ExerciseService {
         t.start();
         return t;
     }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        htmlRepresentation.forEach((key,value)-> value.deleteObserver(observer));
+    }
 }

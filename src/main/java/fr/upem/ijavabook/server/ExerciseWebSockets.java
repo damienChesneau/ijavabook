@@ -1,6 +1,7 @@
 package fr.upem.ijavabook.server;
 
 
+import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
@@ -25,6 +26,13 @@ class ExerciseWebSockets {
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
+    private final Observer observer = new Observer() {
+        @Override
+        public void update(Observable o, Object arg) {
+            sws.writeFinalTextFrame(new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, arg).toJson());
+        }
+    };
+
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
      */
@@ -47,7 +55,7 @@ class ExerciseWebSockets {
     }
 
     final String requerstAnExercice(TransactionParser<String> tp) {
-        String exercise = getExercise(getExercicePath(tp.getMessage()),tp);
+        String exercise = getExercise(getExercicePath(tp.getMessage()));
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
         //manageUpdatesOfExercises(exerciseP, tp);
         return creator.toJson();
@@ -62,35 +70,6 @@ class ExerciseWebSockets {
         return c.toJson();
     }
 
-   /*
-   private final void manageUpdatesOfExercises(Path exercice, TransactionParser<String> tp) {
-        Path p = exercice.getParent().toAbsolutePath();
-        Thread t = new Thread(watcher(p, sws, exercice, tp));
-        t.start();
-    }
-
-    private Runnable watcher(Path directory, ServerWebSocket sws, Path exercise, TransactionParser<String> tp) {
-        return () -> {
-            Watcher watcher = new Watcher(directory, false);
-            watcher.setOnUpdate(watcherOnExercice(sws, exercise, tp));
-            try {
-                watcher.start();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();//NO PROBEM.
-            }
-        };
-    }
-
-    private Consumer<String> watcherOnExercice(ServerWebSocket sws, Path exercise, TransactionParser<String> tp) {
-        return (filename) -> {
-            if (filename.equals(exercise.getFileName().toString())) {
-                openedExercices.updateExercise(exercise);
-                sws.writeFinalTextFrame(requerstAnExercice(tp));
-            }
-        };
-    }
-    */
-
     /**
      * To use for close interpreter instance.
      *
@@ -100,24 +79,16 @@ class ExerciseWebSockets {
     public ServerWebSocket onClose(Void voiD) {
         interpreter.close();
         threadPool.shutdown();
+        Exercises.getExerciseSrv().removeObserver(observer);
         return null;
     }
 
     private String getExercicePath(String exercise) {
-       /* Path exercice = Paths.get("markdown/file" + exercise + ".text");//to update
-        if (!Files.exists(exercice)) {
-            sws.writeFinalTextFrame("ERROR->USE OTHER EXERCISE.");
-            throw new AssertionError();
-        }
-        return exercice;*/
         return "markdown/file" + exercise + ".text";
     }
 
-    private String getExercise(String exercise, TransactionParser<String> tp) {
-        return null;
+    private String getExercise(String exercise) {
+        return Exercises.getExerciseSrv().getExercise(exercise,observer);
     }
 
-    public void updateWebSock(String arg) {
-
-    }
 }

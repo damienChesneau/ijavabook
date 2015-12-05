@@ -1,7 +1,5 @@
 package fr.upem.ijavabook.server;
 
-import fr.upem.ijavabook.exmanager.ExerciseService;
-import fr.upem.ijavabook.exmanager.Exercises;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
@@ -18,8 +16,6 @@ import java.util.*;
 class RouteManager extends AbstractVerticle {
 
     private final List<Route> routes;
-    private final ExerciseService exerciceManager = Exercises.getExerciseSrv();
-    private final Thread watcher = exerciceManager.start();
 
     RouteManager(List<Route> routes) {
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
@@ -39,9 +35,6 @@ class RouteManager extends AbstractVerticle {
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-    public String getExercise(String name, Observer observer) {
-        return exerciceManager.getExercise(name,observer);
-    }
 
     private static void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
@@ -51,7 +44,7 @@ class RouteManager extends AbstractVerticle {
         }
     }
 
-    private static class EncaplsulateWebSock implements Runnable,Observer {
+    private static class EncaplsulateWebSock implements Runnable {
         private final ExerciseWebSockets ews;
         private final ServerWebSocket sws;
 
@@ -66,10 +59,6 @@ class RouteManager extends AbstractVerticle {
             sws.closeHandler(ews::onClose);
         }
 
-        @Override
-        public void update(Observable o, Object arg) {
-            ews.updateWebSock((String)arg);
-        }
     }
 
 }
