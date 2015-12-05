@@ -3,6 +3,7 @@ package fr.upem.ijavabook.exmanager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Observer;
 
 /**
  * @author Damien Chesneau - contact@damienchesneau.fr
@@ -14,13 +15,13 @@ public interface ExerciseService {
      * @param java.nio.file.Path Path to text file.
      * @return HTML representation.
      */
-    String getExercise(String file);
+    String getExercise(String file, Observer observer);
 
 
     /**
      * Start the watcher on the repertory.
      */
-    void start();
+    Thread start();
 /*
     /**
      * Update the content of an exercise.

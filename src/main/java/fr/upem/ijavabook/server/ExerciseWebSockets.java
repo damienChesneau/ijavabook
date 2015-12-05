@@ -1,24 +1,14 @@
 package fr.upem.ijavabook.server;
 
-import fr.upem.ijavabook.exmanager.Exercises;
-import fr.upem.ijavabook.exmanager.ExerciseService;
+
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,9 +46,8 @@ class ExerciseWebSockets {
         });
     }
 
-    private final String requerstAnExercice(TransactionParser<String> tp) {
-        //Path exerciseP = getExercicePath(tp.getMessage());
-        String exercise = getExercise(tp.getMessage());
+    final String requerstAnExercice(TransactionParser<String> tp) {
+        String exercise = getExercise(getExercicePath(tp.getMessage()),tp);
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
         //manageUpdatesOfExercises(exerciseP, tp);
         return creator.toJson();
@@ -114,17 +103,21 @@ class ExerciseWebSockets {
         return null;
     }
 
-   /* private Path getExercicePath(String exercise) {
-        Path exercice = Paths.get("markdown/file" + exercise + ".text");//to update
+    private String getExercicePath(String exercise) {
+       /* Path exercice = Paths.get("markdown/file" + exercise + ".text");//to update
         if (!Files.exists(exercice)) {
             sws.writeFinalTextFrame("ERROR->USE OTHER EXERCISE.");
             throw new AssertionError();
         }
-        return exercice;
-    }*/
-
-    private String getExercise(String exercise) {
-        return Servers.getServer().getExercise(exercise);
+        return exercice;*/
+        return "markdown/file" + exercise + ".text";
     }
 
+    private String getExercise(String exercise, TransactionParser<String> tp) {
+        return null;
+    }
+
+    public void updateWebSock(String arg) {
+
+    }
 }

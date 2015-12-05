@@ -1,14 +1,14 @@
 package fr.upem.ijavabook.server;
 
+import fr.upem.ijavabook.exmanager.ExerciseService;
+import fr.upem.ijavabook.exmanager.Exercises;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Manage all routes.
@@ -18,6 +18,8 @@ import java.util.Objects;
 class RouteManager extends AbstractVerticle {
 
     private final List<Route> routes;
+    private final ExerciseService exerciceManager = Exercises.getExerciseSrv();
+    private final Thread watcher = exerciceManager.start();
 
     RouteManager(List<Route> routes) {
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
@@ -37,6 +39,9 @@ class RouteManager extends AbstractVerticle {
         httpServer.listen(Servers.SERVER_PORT);
     }
 
+    public String getExercise(String name, Observer observer) {
+        return exerciceManager.getExercise(name,observer);
+    }
 
     private static void webSocketExercise(ServerWebSocket sws) {
         if ("/exercice".equals(sws.path())) {
@@ -46,7 +51,7 @@ class RouteManager extends AbstractVerticle {
         }
     }
 
-    private static class EncaplsulateWebSock implements Runnable {
+    private static class EncaplsulateWebSock implements Runnable,Observer {
         private final ExerciseWebSockets ews;
         private final ServerWebSocket sws;
 
@@ -59,6 +64,11 @@ class RouteManager extends AbstractVerticle {
         public void run() {
             sws.handler(ews::start);
             sws.closeHandler(ews::onClose);
+        }
+
+        @Override
+        public void update(Observable o, Object arg) {
+            ews.updateWebSock((String)arg);
         }
     }
 

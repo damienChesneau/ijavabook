@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Observer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,19 +20,24 @@ import java.util.stream.Collectors;
  */
 class ExerciseImpl implements ExerciseService {
 
-    private final HashMap<String, String> htmlRepresentation = new HashMap<>();
+    private final HashMap<String, HtmlObservable> htmlRepresentation = new HashMap<>();
     private final Object monitor = new Object();
 
     @Override
-    public String getExercise(String file) {
+    public String getExercise(String file, Observer observer) {
         synchronized (monitor) {
-            return htmlRepresentation.computeIfAbsent(file, this::getHtmlOfAnMarkdown);
+            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file, (str) -> new HtmlObservable(getHtmlOfAMarkdown(str)));
+            observable.addObserver(observer);
+            return observable.getHtml();
         }
     }
 
     public void updateExercise(String file) {
         synchronized (monitor) {
-            htmlRepresentation.computeIfPresent(file, (key, value) -> getHtmlOfAnMarkdown(file));
+            htmlRepresentation.computeIfPresent("markdown/"+file, (key, value) -> {
+                value.setHtmlTraduction(getHtmlOfAMarkdown(key));
+                return value;
+            });
         }
     }
 
@@ -45,9 +51,9 @@ class ExerciseImpl implements ExerciseService {
         }
     }*/
 
-    private String getHtmlOfAnMarkdown(String file) {
+    private String getHtmlOfAMarkdown(String file) {
         try {
-            String value = Files.readAllLines(Paths.get("markdown/file"+file+".text")).stream().collect(Collectors.joining("\n"));
+            String value = Files.readAllLines(Paths.get(file)).stream().collect(Collectors.joining("\n"));
             return new PegDownProcessor().markdownToHtml(value);
         } catch (IOException e) {
             throw new AssertionError();
@@ -55,12 +61,17 @@ class ExerciseImpl implements ExerciseService {
     }
 
     @Override
-    public void start() {
-        Watcher watcher = new Watcher(Paths.get("markdown/"), false);
-        watcher.setOnUpdate((str)-> updateExercise(str));
-        try {
-            watcher.start();
-        } catch (IOException | InterruptedException e) {
-        }
+    public Thread start() {
+        Thread t = new Thread(()-> {
+            Watcher watcher = new Watcher(Paths.get("markdown/"), false);
+            watcher.setOnUpdate(this::updateExercise);
+            try {
+                watcher.start();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+        return t;
     }
 }

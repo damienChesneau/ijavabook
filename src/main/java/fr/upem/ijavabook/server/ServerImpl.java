@@ -5,8 +5,10 @@ import fr.upem.ijavabook.exmanager.Exercises;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Observer;
 
 /**
  * Implentation how controls all of server flux.
@@ -16,7 +18,6 @@ import java.util.Objects;
 class ServerImpl implements Server {
 
     private final Vertx web_srv = Vertx.vertx();
-    private final ExerciseService exerciceManager = Exercises.getExerciseSrv();
 
     ServerImpl() {
         System.setProperty("vertx.disableFileCaching", "true");//DEV
@@ -27,14 +28,9 @@ class ServerImpl implements Server {
         ArrayList<Route> routes = new ArrayList<>();
         routes.add(new Route("/exercise/:id", ServerImpl::getExerciceHandle));
         web_srv.deployVerticle(new RouteManager(routes));
-        exerciceManager.start();
         return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
-    @Override
-    public String getExercise(String name) {
-        return null;
-    }
 
     private static void getExerciceHandle(RoutingContext rc) {
         String id = rc.request().getParam("id");
