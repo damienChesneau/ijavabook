@@ -5,9 +5,7 @@ package fr.upem.ijavabook.server;
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
 enum ContentTypeVal {
-    KEY_VALUE("content-type"),
-    APPLICATION_JSON("application/json"),
-    APPLICATION_XML("application/xml");
+    KEY_VALUE("content-type"), APPLICATION_JSON("application/json");
 
     private final String content;
 

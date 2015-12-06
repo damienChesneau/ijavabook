@@ -10,24 +10,24 @@ import java.util.Optional;
 enum TransactionPattern {
     TYPE_PATTERN("t"), MESSAGE_PATTERN("m"), REQUEST_JAVA_CODE("jc"), REQUEST_ASK_EXERCISE("gete"),
     RESPONSE_EXERCISE("ex"), RESPONSE_CODE_OUTPUT("op"), RESPONSE_GET_ALL("rga");
-    private String traduct;//Is a little expression to create little json Objects. This is faster.
+    private String transalation;//Is a little expression to create little json Objects. This is faster.
 
-    TransactionPattern(String traduct) {
-        this.traduct = traduct;
+    TransactionPattern(String transalation) {
+        this.transalation = transalation;
     }
 
-    String getTraduct() {
-        return traduct;
+    String getTranslation() {
+        return transalation;
     }
 
     /**
-     * Get Object instance by her String traduction.
-     * @param traduction
+     * Get Object instance by her String translation.
+     * @param translation String of the pattern.
      * @return TransactionPattern instance.
      */
-    static TransactionPattern getByTraduction(String traduction) {
+    static TransactionPattern getByTranslation(String translation) {
          Optional<TransactionPattern> oTP = Arrays.stream(values())
-                 .filter(item -> item.getTraduct().equals(traduction))
+                 .filter(item -> item.getTranslation().equals(translation))
                  .findFirst();
         if(!oTP.isPresent()){
             throw new IllegalArgumentException("Please send a real type in parameter.");

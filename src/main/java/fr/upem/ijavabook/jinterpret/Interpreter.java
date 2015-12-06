@@ -36,5 +36,6 @@ public interface Interpreter extends AutoCloseable {
      */
     List<String> getErrors();
 
+    @Override
     void close();
 }

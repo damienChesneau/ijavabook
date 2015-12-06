@@ -3,25 +3,25 @@ package fr.upem.ijavabook.exmanager;
 import java.nio.file.Path;
 
 /**
+ * Static factory.
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
 public class Exercises {
 
-    private static ExerciseImpl EXERCICE_INSTANCE;
-    private static Thread WATCHER_THREAD;
+    private static ExerciseImpl EXERCISE_INSTANCE;
     private Exercises() {
     }
     public static void start(Path rootDirectory){
-        if(EXERCICE_INSTANCE == null){
-            EXERCICE_INSTANCE = new ExerciseImpl(rootDirectory);
-            WATCHER_THREAD = EXERCICE_INSTANCE.start();
+        if(EXERCISE_INSTANCE == null){
+            EXERCISE_INSTANCE = new ExerciseImpl(rootDirectory);
+            EXERCISE_INSTANCE.start();
         }
     }
     /**
      * Hide implementation of a singleton exercise.
-     * @return An implementation to get your exercices.
+     * @return An implementation to get your exercises.
      */
     public static ExerciseService getExerciseSrv() {
-        return EXERCICE_INSTANCE;
+        return EXERCISE_INSTANCE;
     }
 }

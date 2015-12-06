@@ -4,26 +4,26 @@ import java.util.Objects;
 import java.util.Observable;
 
 /**
- * Mutable state of a markdown traduction.
+ * Mutable state of a markdown translation.
  * Created by steeve on 05/12/15.
  */
 class HtmlObservable extends Observable{
-    private String htmlTraduction;
+    private String htmlTranslation;
 
     HtmlObservable(String str){
         super();
-        htmlTraduction = str;
+        htmlTranslation = str;
     }
 
-    void setHtmlTraduction(String str){
+    void setHtmlTranslation(String str){
         Objects.requireNonNull(str);
-        htmlTraduction = str;
+        htmlTranslation = str;
         setChanged();
-        notifyObservers(htmlTraduction);
+        notifyObservers(htmlTranslation);
     }
 
     String getHtml(){
-        return htmlTraduction;
+        return htmlTranslation;
     }
 
 }

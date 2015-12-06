@@ -12,7 +12,7 @@ public class InterpretedLine {
 
     /**
      * @param value     Of interpreted expression.
-     * @param exception If hava an exception.
+     * @param exception If have an exception.
      * @param valid     true if expression is ok.
      */
     InterpretedLine(String value, String exception, boolean valid) {

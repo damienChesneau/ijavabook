@@ -11,8 +11,12 @@ import java.nio.file.Path;
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
 public class Interpreters {
+    private Interpreters() {
+    }
+
     /**
      * Get implementation of java interpreter designed for are easy to use.
+     * @throws Error if io exception in output files.
      * @return java interpreter.
      */
     public static Interpreter getJavaInterpreter() {

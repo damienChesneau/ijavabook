@@ -28,12 +28,12 @@ class ServerImpl implements Server {
     @Override
     public String start() {
         ArrayList<Route> routes = new ArrayList<>();
-        routes.add(new Route("/getallexercices/", this::getAllExerciceHandle));
+        routes.add(new Route("/getallexercices/", this::getAllExerciseHandle));
         web_srv.deployVerticle(new RouteManager(routes, rootDirectory));
         return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
-    public void getAllExerciceHandle(RoutingContext rc) {
+    public void getAllExerciseHandle(RoutingContext rc) {
         List<Path> allByDirectory = Exercises.getExerciseSrv().getAllByDirectory(rootDirectory);
         List<String> filesNames = allByDirectory.stream().map((file) -> {
             String filename = file.getFileName().toString();

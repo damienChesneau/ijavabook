@@ -8,6 +8,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  *
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
-class ExerciseWebSockets {
+class ExerciseWebSockets implements Observer {
     /**
      * Define all methods.
      */
@@ -28,12 +29,6 @@ class ExerciseWebSockets {
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
     private final Path rootDirectory;
-    private final Observer observer = new Observer() {
-        @Override
-        public void update(Observable o, Object arg) {
-            sws.writeFinalTextFrame(new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, arg).toJson());
-        }
-    };
 
     /**
      * @param sws ServerWebSocket instance to write and recives datas.
@@ -58,7 +53,7 @@ class ExerciseWebSockets {
     }
 
     final String requerstAnExercice(TransactionParser<String> tp) {
-        String exercise = getExercise(getExercicePath(tp.getMessage()));
+        String exercise = getExercise(getExercisePath(Paths.get(tp.getMessage() + ".text")));
         TransactionParser creator = new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise);
         return creator.toJson();
     }
@@ -81,15 +76,20 @@ class ExerciseWebSockets {
     public ServerWebSocket onClose(Void voiD) {
         interpreter.close();
         threadPool.shutdown();
-        Exercises.getExerciseSrv().removeObserver(observer);
-        return null;
+        Exercises.getExerciseSrv().removeObserver(this);
+        return sws;
     }
 
-    private String getExercicePath(String exercise) {
-        return rootDirectory.resolve(exercise).normalize().toString();
-    }
-    private String getExercise(String exercise) {
-        return Exercises.getExerciseSrv().getExercise(exercise,observer);
+    private Path getExercisePath(Path exercise) {
+        return rootDirectory.resolve(exercise).normalize();
     }
 
+    private String getExercise(Path exercise) {
+        return Exercises.getExerciseSrv().getExercise(exercise, this);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        sws.writeFinalTextFrame(new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, arg).toJson());
+    }
 }

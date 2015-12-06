@@ -18,7 +18,7 @@ class TransactionParser<T> {
     private final T message;
 
     /**
-     * @param type    of transaction.
+     * @param type of transaction.
      * @param message to send.
      */
     TransactionParser(TransactionPattern type, T message) {
@@ -41,8 +41,8 @@ class TransactionParser<T> {
      */
     String toJson() {
         JsonObject json = new JsonObject();
-        json.put(TransactionPattern.TYPE_PATTERN.getTraduct(), type.getTraduct());
-        json.put(TransactionPattern.MESSAGE_PATTERN.getTraduct(), message);
+        json.put(TransactionPattern.TYPE_PATTERN.getTranslation(), type.getTranslation());
+        json.put(TransactionPattern.MESSAGE_PATTERN.getTranslation(), message);
         return json.encode();
     }
 
@@ -55,9 +55,9 @@ class TransactionParser<T> {
     static TransactionParser parse(String query) {
         Objects.requireNonNull(query);
         JsonObject json = new JsonObject(query);
-        String tpAsStr = json.getString(TransactionPattern.TYPE_PATTERN.getTraduct());
-        String message = json.getString(TransactionPattern.MESSAGE_PATTERN.getTraduct());
-        return new TransactionParser(TransactionPattern.getByTraduction(tpAsStr), message);
+        String tpAsStr = json.getString(TransactionPattern.TYPE_PATTERN.getTranslation());
+        String message = json.getString(TransactionPattern.MESSAGE_PATTERN.getTranslation());
+        return new TransactionParser(TransactionPattern.getByTranslation(tpAsStr), message);
     }
 
     static class BuilderJavaInterpreted {
