@@ -25,7 +25,7 @@ class ExerciseWebSockets implements Observer {
     /**
      * Define all methods.
      */
-    private final HashMap<TransactionPattern, Function<TransactionParser, String>> operations = new HashMap<>();
+    private final Map<TransactionPattern, Function<TransactionParser, String>> operations;
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExerciseService exerciseManager;
@@ -37,9 +37,15 @@ class ExerciseWebSockets implements Observer {
     ExerciseWebSockets(ServerWebSocket sws, Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.sws = Objects.requireNonNull(sws);
-        this.operations.put(TransactionPattern.REQUEST_ASK_EXERCISE, this::requerstAnExercice);
-        this.operations.put(TransactionPattern.REQUEST_JAVA_CODE, this::requerstAnJavaCode);
+        this.operations = getUnmodifiableOperations();
         this.exerciseManager = Servers.getExerciceManager();
+    }
+
+    private Map<TransactionPattern, Function<TransactionParser, String>> getUnmodifiableOperations() {
+        HashMap<TransactionPattern,Function<TransactionParser,String>> temporaryMap = new HashMap<>();
+        temporaryMap.put(TransactionPattern.REQUEST_ASK_EXERCISE, this::requerstAnExercice);
+        temporaryMap.put(TransactionPattern.REQUEST_JAVA_CODE, this::requerstAnJavaCode);
+        return Collections.unmodifiableMap(temporaryMap);
     }
 
     /**
