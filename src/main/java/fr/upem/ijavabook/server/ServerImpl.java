@@ -33,13 +33,13 @@ class ServerImpl implements Server {
         return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
-    public void getAllExerciseHandle(RoutingContext rc) {
+    public void getAllExerciseHandle(RoutingContext routingContext) {
         List<Path> allByDirectory = Exercises.getExerciseSrv().getAllByDirectory(rootDirectory);
         List<String> filesNames = allByDirectory.stream().map((file) -> {
             String filename = file.getFileName().toString();
             return filename.substring(0, filename.length() - 5);
         }).collect(Collectors.toList());
-        rc.response()
+        routingContext.response()
                 .putHeader(ContentTypeVal.KEY_VALUE.getContent(), ContentTypeVal.APPLICATION_JSON.getContent())
                 .end(new TransactionParser.BuilderJavaList(TransactionPattern.RESPONSE_GET_ALL).setList(filesNames).build().toJson());
     }

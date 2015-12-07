@@ -7,7 +7,9 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Manage all routes.
@@ -30,7 +32,12 @@ class RouteManager extends AbstractVerticle {
     @Override
     public void start() {
         Router router = Router.router(vertx);
-        routes.forEach(routes -> router.get(routes.getRoute()).handler(routes.getEvent())); // route to JSON REST APIs
+        routes.forEach(routes -> {
+            router.get(routes.getRoute()).handler(comingEvent -> {
+                onlyCurrentComputer(comingEvent.request().getHeader("Host"));
+                routes.getEvent().handle(comingEvent);
+            });
+        }); // route to JSON REST APIs
         router.route().handler(StaticHandler.create());// otherwise serve static pages
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.requestHandler(router::accept);
@@ -38,13 +45,18 @@ class RouteManager extends AbstractVerticle {
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-    private void webSocketExercise(ServerWebSocket sws) {
-        if ("/exercice".equals(sws.path())) {
-            ExerciseWebSockets ews = new ExerciseWebSockets(sws, rootDirectory);
-            sws.handler(ews::start);
-            sws.closeHandler(ews::onClose);
+    private void webSocketExercise(ServerWebSocket serverWebSocket) {
+        onlyCurrentComputer(serverWebSocket.headers().get("Host"));
+        if ("/exercice".equals(serverWebSocket.path())) {
+            ExerciseWebSockets ews = new ExerciseWebSockets(serverWebSocket, rootDirectory);
+            serverWebSocket.handler(ews::start);
+            serverWebSocket.closeHandler(ews::onClose);
         }
-
     }
 
+    private void onlyCurrentComputer(String host) {
+        if (!("localhost:" + Servers.SERVER_PORT).equals(host)) {
+            throw new IllegalAccessError("Client are not allow to read this.");
+        }
+    }
 }
