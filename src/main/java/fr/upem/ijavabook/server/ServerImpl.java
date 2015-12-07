@@ -1,5 +1,6 @@
 package fr.upem.ijavabook.server;
 
+import fr.upem.ijavabook.exmanager.ExerciseService;
 import fr.upem.ijavabook.exmanager.Exercises;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 class ServerImpl implements Server {
 
     private final Vertx web_srv = Vertx.vertx();
+    private final ExerciseService exerciseManager;
     private final Path rootDirectory;
 
     ServerImpl(Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
+        exerciseManager = Exercises.getExerciseSrv(rootDirectory);
         System.setProperty("vertx.disableFileCaching", "true");//DEV
     }
 
@@ -34,7 +37,7 @@ class ServerImpl implements Server {
     }
 
     public void getAllExerciseHandle(RoutingContext routingContext) {
-        List<Path> allByDirectory = Exercises.getExerciseSrv().getAllByDirectory(rootDirectory);
+        List<Path> allByDirectory = exerciseManager.getAllByDirectory(rootDirectory);
         List<String> filesNames = allByDirectory.stream().map((file) -> {
             String filename = file.getFileName().toString();
             return filename.substring(0, filename.length() - 5);
@@ -46,6 +49,12 @@ class ServerImpl implements Server {
 
     @Override
     public void stop() {
+        exerciseManager.stopWatcher();
         web_srv.close();
+    }
+
+    @Override
+    public ExerciseService getExerciceManager() {
+        return this.exerciseManager;
     }
 }

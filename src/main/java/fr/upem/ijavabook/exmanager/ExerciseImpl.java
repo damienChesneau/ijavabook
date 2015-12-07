@@ -19,18 +19,29 @@ import java.util.stream.Collectors;
  */
 class ExerciseImpl implements ExerciseService {
 
-    private final HashMap<Path, HtmlObservable> htmlRepresentation = new HashMap<>();
-    private final Path rootDirectory;
+    private final HashMap<String, HtmlObservable> htmlRepresentation = new HashMap<>();
+    private final Thread watcher;
     private final Object monitor = new Object();
 
     ExerciseImpl(Path rootDirectory){
-        this.rootDirectory = Objects.requireNonNull(rootDirectory);
+        Objects.requireNonNull(rootDirectory);
+        this.watcher = new Thread(()-> {
+            Watcher watcher = new Watcher(rootDirectory, false);
+            watcher.setOnUpdate(this::updateExercise);
+            try {
+                watcher.start();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
+
+
 
     @Override
     public String getExercise(Path file, Observer observer) {
         synchronized (monitor) {
-            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file, (str) -> new HtmlObservable(getHtmlOfAMarkdown(str)));
+            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file.toAbsolutePath().toString(), (str) -> new HtmlObservable(getHtmlOfAMarkdown(file)));
             observable.addObserver(observer);
             return observable.getHtml();
         }
@@ -38,13 +49,23 @@ class ExerciseImpl implements ExerciseService {
 
     public void updateExercise(Path file) {
         synchronized (monitor) {
-            htmlRepresentation.computeIfPresent(file, (key, value) -> {
-                value.setHtmlTranslation(getHtmlOfAMarkdown(key));
+            htmlRepresentation.computeIfPresent(file.toAbsolutePath().toString(), (key, value) -> {
+                value.setHtmlTranslation(getHtmlOfAMarkdown(file));
                 return value;
             });
         }
     }
-    
+
+    @Override
+    public void startWatcher() {
+        watcher.start();
+    }
+
+    @Override
+    public void stopWatcher() {
+        watcher.interrupt();
+    }
+
     @Override
     public List<Path> getAllByDirectory(Path path) {
         try {
@@ -63,21 +84,6 @@ class ExerciseImpl implements ExerciseService {
         } catch (IOException e) {
             throw new AssertionError();
         }
-    }
-
-    @Override
-    public Thread start() {
-        Thread t = new Thread(()-> {
-            Watcher watcher = new Watcher(rootDirectory, false);
-            watcher.setOnUpdate(this::updateExercise);
-            try {
-                watcher.start();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        t.start();
-        return t;
     }
 
     @Override

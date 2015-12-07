@@ -1,5 +1,7 @@
 package fr.upem.ijavabook.server;
 
+import fr.upem.ijavabook.exmanager.ExerciseService;
+
 import java.nio.file.Path;
 
 /**
@@ -25,8 +27,13 @@ public class Servers {
     public static Server getServer(Path rootDirectory) {
         if (serverInstance == null) {
             serverInstance = new ServerImpl(rootDirectory);
+            serverInstance.getExerciceManager().startWatcher();
         }
         return serverInstance;
+    }
+
+    public static ExerciseService getExerciceManager(){
+        return serverInstance.getExerciceManager();
     }
 
 }

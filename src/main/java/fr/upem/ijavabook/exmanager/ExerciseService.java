@@ -21,7 +21,12 @@ public interface ExerciseService {
     /**
      * Start the watcher on the repertory.
      */
-    Thread start();
+    void startWatcher();
+
+    /**
+     * Stop the watcher on the repertory.
+     */
+    void stopWatcher();
 
     /**
      * Remove an observer from the data map.

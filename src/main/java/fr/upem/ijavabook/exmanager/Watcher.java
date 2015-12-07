@@ -67,6 +67,6 @@ class Watcher {
     private void callUserLambda(WatchEvent event) {
         Consumer<Path> consumer = calls.getOrDefault(event.kind().toString(), (cs) -> {
         });
-        consumer.accept(Paths.get(event.context().toString()));
+        consumer.accept(directory.resolve(Paths.get(event.context().toString())).normalize());
     }
 }

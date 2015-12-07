@@ -1,5 +1,6 @@
 package fr.upem.ijavabook.server;
 
+import fr.upem.ijavabook.exmanager.ExerciseService;
 import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
@@ -27,6 +28,7 @@ class ExerciseWebSockets implements Observer {
     private final HashMap<TransactionPattern, Function<TransactionParser, String>> operations = new HashMap<>();
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
+    private final ExerciseService exerciseManager;
     private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
     private final Path rootDirectory;
 
@@ -38,6 +40,7 @@ class ExerciseWebSockets implements Observer {
         this.sws = Objects.requireNonNull(sws);
         this.operations.put(TransactionPattern.REQUEST_ASK_EXERCISE, this::requerstAnExercice);
         this.operations.put(TransactionPattern.REQUEST_JAVA_CODE, this::requerstAnJavaCode);
+        this.exerciseManager = Servers.getExerciceManager();
     }
 
     /**
@@ -76,7 +79,7 @@ class ExerciseWebSockets implements Observer {
     public ServerWebSocket onClose(Void voiD) {
         interpreter.close();
         threadPool.shutdown();
-        Exercises.getExerciseSrv().removeObserver(this);
+        exerciseManager.removeObserver(this);
         return sws;
     }
 
@@ -85,7 +88,7 @@ class ExerciseWebSockets implements Observer {
     }
 
     private String getExercise(Path exercise) {
-        return Exercises.getExerciseSrv().getExercise(exercise, this);
+        return exerciseManager.getExercise(exercise, this);
     }
 
     @Override
