@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Manage all routes.
@@ -20,6 +23,7 @@ class RouteManager extends AbstractVerticle {
 
     private final List<Route> routes;
     private final Path rootDirectory;
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(20);
 
     RouteManager(List<Route> routes, Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
@@ -45,14 +49,21 @@ class RouteManager extends AbstractVerticle {
         httpServer.listen(Servers.SERVER_PORT);
     }
 
+    @Override
+    public void stop(){
+        threadPool.shutdown();
+    }
+
     private void webSocketExercise(ServerWebSocket serverWebSocket) {
         onlyCurrentComputer(serverWebSocket.headers().get("Host"));
         if ("/exercice".equals(serverWebSocket.path())) {
             ExerciseWebSockets ews = new ExerciseWebSockets(serverWebSocket, rootDirectory);
-            serverWebSocket.handler(ews::start);
+            serverWebSocket.handler((buffer)-> threadPool.execute(()->ews.start(buffer)));//INCEPTION !
             serverWebSocket.closeHandler(ews::onClose);
         }
     }
+
+
 
     private void onlyCurrentComputer(String host) {
         if (!("localhost:" + Servers.SERVER_PORT).equals(host)) {

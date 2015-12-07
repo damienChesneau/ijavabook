@@ -29,7 +29,6 @@ class ExerciseWebSockets implements Observer {
     private final ServerWebSocket sws;
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
     private final ExerciseService exerciseManager;
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(10);
     private final Path rootDirectory;
 
     /**
@@ -49,10 +48,8 @@ class ExerciseWebSockets implements Observer {
      * @param buf
      */
     public void start(Buffer buf) {
-        threadPool.execute(() -> {
             TransactionParser tp = TransactionParser.parse(String.valueOf(buf));
             sws.writeFinalTextFrame(operations.get(tp.getType()).apply(tp));
-        });
     }
 
     final String requerstAnExercice(TransactionParser<String> tp) {
@@ -78,7 +75,6 @@ class ExerciseWebSockets implements Observer {
      */
     public ServerWebSocket onClose(Void voiD) {
         interpreter.close();
-        threadPool.shutdown();
         exerciseManager.removeObserver(this);
         return sws;
     }
