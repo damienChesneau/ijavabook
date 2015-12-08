@@ -19,8 +19,12 @@ public class Main {
 
     public static void main(String[] args) {
         Path markdownFolder = Paths.get("markdown").toAbsolutePath();//TO BE UPDATE IN PROD
-        Server srv = Servers.getServer(markdownFolder);
-        String start = srv.start();
-        System.out.println("Server started on : " + start);
+        try {
+            Server srv = Servers.getServer(markdownFolder);
+            String start = srv.start();
+            System.out.println("Server started on : " + start);
+        }catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
     }
 }

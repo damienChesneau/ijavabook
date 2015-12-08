@@ -24,7 +24,7 @@ public class Servers {
      *
      * @return a singleton of server controls.
      */
-    public static Server getServer(Path rootDirectory) {
+    public static Server getServer(Path rootDirectory) throws IllegalAccessException {
         if (serverInstance == null) {
             serverInstance = new ServerImpl(rootDirectory);
             serverInstance.getExerciceManager().startWatcher();

@@ -21,12 +21,12 @@ public interface ExerciseService {
     /**
      * Start the watcher on the repertory.
      */
-    void startWatcher();
+    void startWatcher() throws IllegalAccessException;
 
     /**
      * Stop the watcher on the repertory.
      */
-    void stopWatcher();
+    void stopWatcher() throws IllegalAccessException;
 
     /**
      * Remove an observer from the data map.

@@ -15,7 +15,7 @@ public interface Server {
     /**
      * Stop server.
      */
-    void stop();
+    void stop() throws IllegalAccessException;
 
     ExerciseService getExerciceManager();
 }

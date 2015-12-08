@@ -48,7 +48,7 @@ class ServerImpl implements Server {
     }
 
     @Override
-    public void stop() {
+    public void stop() throws IllegalAccessException {
         exerciseManager.stopWatcher();
         web_srv.close();
     }
