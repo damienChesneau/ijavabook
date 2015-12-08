@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 class ExerciseImpl implements ExerciseService {
 
-    private final HashMap<String, HtmlObservable> htmlRepresentation = new HashMap<>();
+    private final HashMap<Path, HtmlObservable> htmlRepresentation = new HashMap<>();
     private final Thread watcher;
     private final Object monitor = new Object();
 
@@ -41,7 +41,7 @@ class ExerciseImpl implements ExerciseService {
     @Override
     public String getExercise(Path file, Observer observer) {
         synchronized (monitor) {
-            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file.toAbsolutePath().toString(), (str) -> new HtmlObservable(getHtmlOfAMarkdown(file)));
+            HtmlObservable observable = htmlRepresentation.computeIfAbsent(file.toAbsolutePath(), (str) -> new HtmlObservable(getHtmlOfAMarkdown(file)));
             observable.addObserver(observer);
             return observable.getHtml();
         }
@@ -49,7 +49,7 @@ class ExerciseImpl implements ExerciseService {
 
     public void updateExercise(Path file) {
         synchronized (monitor) {
-            htmlRepresentation.computeIfPresent(file.toAbsolutePath().toString(), (key, value) -> {
+            htmlRepresentation.computeIfPresent(file.toAbsolutePath(), (key, value) -> {
                 value.setHtmlTranslation(getHtmlOfAMarkdown(file));
                 return value;
             });
