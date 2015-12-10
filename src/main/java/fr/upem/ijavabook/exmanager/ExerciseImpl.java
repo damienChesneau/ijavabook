@@ -11,26 +11,25 @@ import java.util.Objects;
 import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
  * Class allows to have communication with files.
+ *
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
 class ExerciseImpl implements ExerciseService {
 
     private final HashMap<Path, HtmlObservable> htmlRepresentation = new HashMap<>();
-    private Thread watcher;
+    private final Thread watcher;
     private final Path rootDirectory;
     private final Object monitor = new Object();
 
-    ExerciseImpl(Path rootDirectory){
-        Objects.requireNonNull(rootDirectory);
-        this.rootDirectory = rootDirectory;
+    ExerciseImpl(Path rootDirectory) {
+        this.rootDirectory = Objects.requireNonNull(rootDirectory);
+        this.watcher = Objects.requireNonNull(new Thread(new Watcher(rootDirectory, this::updateExercise)));
+        // to be reformated with an other englobing class.
     }
-
-
 
     @Override
     public String getExercise(Path file, Observer observer) {
@@ -41,7 +40,7 @@ class ExerciseImpl implements ExerciseService {
         }
     }
 
-    public void updateExercise(Path file) {
+    private void updateExercise(Path file) {
         synchronized (monitor) {
             htmlRepresentation.computeIfPresent(file.toAbsolutePath(), (key, value) -> {
                 value.setHtmlTranslation(getHtmlOfAMarkdown(file));
@@ -52,27 +51,11 @@ class ExerciseImpl implements ExerciseService {
 
     @Override
     public void startWatcher() throws IllegalAccessException {
-        if(watcher != null){
-            throw new IllegalAccessException();
-        }
-        this.watcher = new Thread(()-> {
-            Watcher watcher = new Watcher(rootDirectory, false);
-            watcher.setOnUpdate(this::updateExercise);
-            try {
-                watcher.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch( InterruptedException e){
-            }
-        });
         watcher.start();
     }
 
     @Override
     public void stopWatcher() throws IllegalAccessException {
-        if(watcher == null){
-            throw new IllegalAccessException();
-        }
         watcher.interrupt();
     }
 
@@ -105,6 +88,6 @@ class ExerciseImpl implements ExerciseService {
 
     @Override
     public void removeObserver(Observer observer) {
-        htmlRepresentation.forEach((key,value)-> value.deleteObserver(observer));
+        htmlRepresentation.forEach((key, value) -> value.deleteObserver(observer));
     }
 }

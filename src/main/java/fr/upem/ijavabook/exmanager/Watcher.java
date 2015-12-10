@@ -11,24 +11,26 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 /**
  * API to watch a repository with lambdas.
+ *
  * @author Damien Chesneau - contact@damienchesneau.fr
  */
-class Watcher {
+class Watcher implements Runnable{
     private final Path directory;
     private final boolean showHideFiles;
-    private final HashMap<String, Consumer<Path>> calls = new HashMap<>();
+    private final HashMap<String, Consumer<Path>> calls;
 
-    Watcher(Path directory) {
-        this(directory, true);
+    Watcher(Path directory, Consumer<Path> onUpdate) {
+        this(directory, onUpdate, false);
     }
 
-    Watcher(Path directory, boolean showHideFiles) {
-        this.showHideFiles = showHideFiles;
-        Objects.requireNonNull(directory);
-        if (!Files.isDirectory(directory)) {
+    Watcher(Path directory, Consumer<Path> onUpdate, boolean showHideFiles) {
+        if (!Files.isDirectory(Objects.requireNonNull(directory))) {
             throw new IllegalArgumentException("Please send a path of a directoy.");
         }
+        this.showHideFiles = showHideFiles;
         this.directory = directory;
+        this.calls = new HashMap<>();
+        this.calls.put(ENTRY_MODIFY.name(), onUpdate);
     }
 
     private WatchKey initializer() throws IOException, InterruptedException {
@@ -42,7 +44,7 @@ class Watcher {
         calls.put(ENTRY_MODIFY.name(), runUpdate);
     }
 
-    public void start() throws IOException, InterruptedException {
+    private void launch() throws IOException, InterruptedException {
         while (!Thread.interrupted()) {
             for (WatchEvent event : initializer().pollEvents()) {
                 if (testHiddenFiles().test(event.context().toString())) {
@@ -68,5 +70,16 @@ class Watcher {
         Consumer<Path> consumer = calls.getOrDefault(event.kind().toString(), (cs) -> {
         });
         consumer.accept(directory.resolve(Paths.get(event.context().toString())).normalize());
+    }
+
+    @Override
+    public void run() {
+        try {
+            this.launch();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            return;
+        }
     }
 }
