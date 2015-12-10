@@ -36,19 +36,19 @@ class ExerciseImpl implements ExerciseService {
     @Override
     public String getExercise(Path file, Observer observer) {
         HtmlObservable html;
-        file = file.toAbsolutePath();
         synchronized (monitor){
-            html = htmlRepresentation.computeIfAbsent(file,(str)->new HtmlObservable(getHtmlOfAMarkdown(str)));
+            html = htmlRepresentation.computeIfAbsent(file.toAbsolutePath(),(str)->new HtmlObservable(getHtmlOfAMarkdown(str)));
         }
         html.addObserver(observer);
         return html.getHtml();
     }
 
     private void updateExercise(Path file) {
-        file = file.toAbsolutePath();
-        String html = getHtmlOfAMarkdown(file);
         synchronized (monitor) {
-            htmlRepresentation.get(file).setHtmlTranslation(html);
+                htmlRepresentation.computeIfPresent(file.toAbsolutePath(),(key,value)-> {
+                value.setHtmlTranslation(getHtmlOfAMarkdown(key));
+                return value;
+            });
         }
     }
 
