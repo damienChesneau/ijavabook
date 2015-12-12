@@ -12,7 +12,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 /**
  * API to watch a repository with lambdas.
  *
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 class Watcher implements Runnable{
     private final Path directory;
@@ -69,7 +69,10 @@ class Watcher implements Runnable{
     private void callUserLambda(WatchEvent event) {
         Consumer<Path> consumer = calls.getOrDefault(event.kind().toString(), (cs) -> {
         });
-        consumer.accept(directory.resolve(Paths.get(event.context().toString())).normalize());
+        Path resolve = directory.resolve((event.context().toString())).normalize();
+        if(Files.exists(resolve)){
+            consumer.accept(resolve);
+        }
     }
 
     @Override

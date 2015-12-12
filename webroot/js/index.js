@@ -1,5 +1,5 @@
 /**
- * Created by damien on 05/12/15.
+ * @author Damien Chesneau
  */
 $.ajax({
     method: "GET",

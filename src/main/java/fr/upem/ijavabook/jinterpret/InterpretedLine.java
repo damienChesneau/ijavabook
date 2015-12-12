@@ -3,7 +3,7 @@ package fr.upem.ijavabook.jinterpret;
 import java.util.Objects;
 
 /**
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public class InterpretedLine {
     private final boolean valid;

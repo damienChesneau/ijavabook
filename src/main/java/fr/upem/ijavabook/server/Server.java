@@ -1,10 +1,8 @@
 package fr.upem.ijavabook.server;
 
-import fr.upem.ijavabook.exmanager.ExerciseService;
-
 /**
  * Do action in server.
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public interface Server {
     /**
@@ -15,7 +13,6 @@ public interface Server {
     /**
      * Stop server.
      */
-    void stop() throws IllegalAccessException;
+    void stop() ;
 
-    ExerciseService getExerciceManager();
 }

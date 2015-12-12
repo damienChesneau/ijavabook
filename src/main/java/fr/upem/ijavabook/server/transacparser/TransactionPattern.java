@@ -1,15 +1,17 @@
-package fr.upem.ijavabook.server;
+package fr.upem.ijavabook.server.transacparser;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 /**
  * Define formatted names to send in request/ responses.
- * @author Damien Chesneau - contact@damienchesneau.fr
+ *
+ * @author Damien Chesneau
  */
-enum TransactionPattern {
-    TYPE_PATTERN("t"), MESSAGE_PATTERN("m"), REQUEST_JAVA_CODE("jc"), REQUEST_ASK_EXERCISE("gete"),
-    RESPONSE_EXERCISE("ex"), RESPONSE_CODE_OUTPUT("op"), RESPONSE_GET_ALL("rga");
+public enum TransactionPattern {
+    TYPE_PATTERN("t"), MESSAGE_PATTERN("m"), REQUEST_JAVA_CODE("jc"), REQUEST_ASK_EXERCISE("gete"), RESPONSE_EXERCISE("ex"),
+    RESPONSE_TOKEN_EXERCISE("tex"), RESPONSE_CODE_OUTPUT("op"), RESPONSE_GET_ALL("rga"), RESPONSE_NEW_TOKEN("nt"),
+    REQUEST_TOKEN("to");
     private String transalation;//Is a little expression to create little json Objects. This is faster.
 
     TransactionPattern(String transalation) {
@@ -22,17 +24,20 @@ enum TransactionPattern {
 
     /**
      * Get Object instance by her String translation.
+     *
+     *
+     * @param t
      * @param translation String of the pattern.
      * @return TransactionPattern instance.
      */
     static TransactionPattern getByTranslation(String translation) {
-         Optional<TransactionPattern> oTP = Arrays.stream(values())
-                 .filter(item -> item.getTranslation().equals(translation))
-                 .findFirst();
-        if(!oTP.isPresent()){
+        Optional<TransactionPattern> oTP = Arrays.stream(values())
+                .filter(item -> item.getTranslation().equals(translation))
+                .findFirst();
+        if (!oTP.isPresent()) {
             throw new IllegalArgumentException("Please send a real type in parameter.");
         }
-        return oTP.get();// TO REFORMAT
+        return oTP.get();
     }
 
 }

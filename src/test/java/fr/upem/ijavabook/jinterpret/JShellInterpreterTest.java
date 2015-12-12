@@ -8,7 +8,7 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 
 /**
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public class JShellInterpreterTest {
 

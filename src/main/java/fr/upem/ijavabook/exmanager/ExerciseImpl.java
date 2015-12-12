@@ -1,6 +1,6 @@
 package fr.upem.ijavabook.exmanager;
 
-import javafx.beans.Observable;
+import fr.upem.ijavabook.server.EventBusSender;
 import org.pegdown.PegDownProcessor;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Class allows to have communication with files.
  *
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 class ExerciseImpl implements ExerciseService {
 
@@ -26,9 +26,11 @@ class ExerciseImpl implements ExerciseService {
     private final Path rootDirectory;
     private final Object monitor = new Object();
     private final Object fileMonitor = new Object();
+    private final EventBusSender eventBusSender;
 
-    ExerciseImpl(Path rootDirectory) {
+    ExerciseImpl(Path rootDirectory, EventBusSender eventBusSender) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
+        this.eventBusSender = Objects.requireNonNull(eventBusSender);
         this.watcher = Objects.requireNonNull(new Thread(new Watcher(rootDirectory, this::updateExercise)));
         // to be reformated with an other englobing class.
     }
@@ -36,29 +38,30 @@ class ExerciseImpl implements ExerciseService {
     @Override
     public String getExercise(Path file, Observer observer) {
         HtmlObservable html;
-        synchronized (monitor){
-            html = htmlRepresentation.computeIfAbsent(file.toAbsolutePath(),(str)->new HtmlObservable(getHtmlOfAMarkdown(str)));
+        synchronized (monitor) {
+            html = htmlRepresentation.computeIfAbsent(file.toAbsolutePath(), (str) -> new HtmlObservable(getHtmlOfAMarkdown(str)));
         }
-        html.addObserver(observer);
         return html.getHtml();
     }
 
     private void updateExercise(Path file) {
+        String trad = getHtmlOfAMarkdown(file);
         synchronized (monitor) {
-                htmlRepresentation.computeIfPresent(file.toAbsolutePath(),(key,value)-> {
-                value.setHtmlTranslation(getHtmlOfAMarkdown(key));
+            htmlRepresentation.computeIfPresent(file.toAbsolutePath(), (key, value) -> {
+                value.setHtmlTranslation(trad);
+                eventBusSender.send(key, trad);
                 return value;
             });
         }
     }
 
     @Override
-    public void startWatcher() throws IllegalAccessException {
+    public void startWatcher() {
         watcher.start();
     }
 
     @Override
-    public void stopWatcher() throws IllegalAccessException {
+    public void stopWatcher() {
         watcher.interrupt();
     }
 
@@ -72,6 +75,16 @@ class ExerciseImpl implements ExerciseService {
         }
     }
 
+    @Override
+    public List<String> getFilesNamesWithoutExtension() {
+        List<Path> allByDirectory = this.getAllByDirectory(rootDirectory);
+        return allByDirectory.stream()
+                .map((path -> path.getFileName().toString()))
+                .map((filename) -> filename.substring(0, filename.length() - 5))
+                .collect(Collectors.<String>toList());
+
+    }
+
     private String getHtmlOfAMarkdown(Path file) {
         try {
             List<String> lines;
@@ -80,7 +93,7 @@ class ExerciseImpl implements ExerciseService {
             }
             return new PegDownProcessor().markdownToHtml(lines.stream().collect(Collectors.joining("\n")));
         } catch (IOException e) {
-            throw new AssertionError();
+            throw new AssertionError(e);
         }
     }
 

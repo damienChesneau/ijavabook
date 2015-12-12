@@ -5,7 +5,7 @@ import java.util.Observable;
 
 /**
  * Mutable state of a markdown translation.
- * Created by steeve on 05/12/15.
+ * @author Steeve Sivanantham
  */
 class HtmlObservable extends Observable{
     private String htmlTranslation;
@@ -18,8 +18,8 @@ class HtmlObservable extends Observable{
     void setHtmlTranslation(String str){
         Objects.requireNonNull(str);
         htmlTranslation = str;
-        setChanged();
-        notifyObservers(htmlTranslation);
+        /*setChanged();
+        notifyObservers(htmlTranslation);*/
     }
 
     String getHtml(){

@@ -1,5 +1,5 @@
 /**
- * Created by damien on 08/12/15.
+ * @author Damien Chesneau
  */
 
 if (window.location.hostname != "localhost") {

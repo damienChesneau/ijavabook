@@ -3,7 +3,7 @@ package fr.upem.ijavabook.jinterpret;
 import java.util.List;
 
 /**
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public interface Interpreter extends AutoCloseable {
     /**

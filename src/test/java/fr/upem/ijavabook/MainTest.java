@@ -1,18 +1,26 @@
 package fr.upem.ijavabook;
 
-import org.junit.Test;
+import fr.upem.ijavabook.server.Server;
+import fr.upem.ijavabook.server.Servers;
 
-import static junit.framework.TestCase.assertEquals;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * JShell Book program input.
  *
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public class MainTest {
 
-    @Test
-    public void exemple() {
-        assertEquals("", "");
+    private MainTest() {
     }
+
+    public static void main(String[] args) {
+        Path markdownFolder = Paths.get("markdown").toAbsolutePath();//TO BE UPDATE IN PROD
+        Server srv = Servers.getServer(markdownFolder);
+        String start = srv.start();
+        System.out.println("Server started on : " + start);
+    }
+
 }

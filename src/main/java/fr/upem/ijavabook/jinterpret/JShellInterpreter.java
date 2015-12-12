@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 class JShellInterpreter implements Interpreter {
     private final Path pNominal;
@@ -31,7 +31,7 @@ class JShellInterpreter implements Interpreter {
 
     @Override
     public List<InterpretedLine> interpretAll(List<String> lines) {
-        return lines.stream().map((line) -> interpret(line)).collect(Collectors.toList());
+        return lines.stream().map((line) -> interpret(line)).collect(Collectors.<InterpretedLine>toList());
     }
 
     @Override

@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Observer;
 
 /**
- *  Interface who allows all markdown files actions.
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * Interface who allows all markdown files actions.
+ *
+ * @author Damien Chesneau
  */
 public interface ExerciseService {
     /**
@@ -21,23 +22,27 @@ public interface ExerciseService {
     /**
      * Start the watcher on the repertory.
      */
-    void startWatcher() throws IllegalAccessException;
+    void startWatcher();
 
     /**
      * Stop the watcher on the repertory.
      */
-    void stopWatcher() throws IllegalAccessException;
+    void stopWatcher();
 
     /**
      * Remove an observer from the data map.
+     *
      * @param observer an instance of observer.
      */
     void removeObserver(Observer observer);
 
     /**
      * Get all files and put her in a list.
+     *
      * @param path of the directory.
      * @return a list of markdown files.
      */
     List<Path> getAllByDirectory(Path path);
+
+    List<String> getFilesNamesWithoutExtension();
 }

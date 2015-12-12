@@ -1,6 +1,5 @@
 package fr.upem.ijavabook;
 
-import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.server.Server;
 import fr.upem.ijavabook.server.Servers;
 
@@ -10,7 +9,7 @@ import java.nio.file.Paths;
 /**
  * JShell Book program input.
  *
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public class Main {
 
@@ -18,13 +17,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Path markdownFolder = Paths.get("markdown").toAbsolutePath();//TO BE UPDATE IN PROD
-        try {
-            Server srv = Servers.getServer(markdownFolder);
-            String start = srv.start();
-            System.out.println("Server started on : " + start);
-        }catch (IllegalAccessException e){
-            e.printStackTrace();
-        }
+        Path markdownFolder = Paths.get(".").toAbsolutePath();//TO BE UPDATE IN PROD
+        Server srv = Servers.getServer(markdownFolder);
+        String start = srv.start();
+        System.out.println("Server started on : " + start);
     }
 }

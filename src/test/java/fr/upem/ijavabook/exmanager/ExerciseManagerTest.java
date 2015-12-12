@@ -10,7 +10,7 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * JShell Book program input.
  *
- * @author Damien Chesneau - contact@damienchesneau.fr
+ * @author Damien Chesneau
  */
 public class ExerciseManagerTest {
 
@@ -18,7 +18,7 @@ public class ExerciseManagerTest {
     public void dev() {
         Path path = Paths.get("markdown", "file.text");
         System.out.println(path.toAbsolutePath());
-       // Exercises.getExerciseSrv().getExercise(path);
+        // Exercises.getExerciseSrv().getExercise(path);
         assertEquals("", "");
     }
 }
