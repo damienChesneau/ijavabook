@@ -87,11 +87,11 @@ class ExerciseImpl implements ExerciseService {
 
     private String getHtmlOfAMarkdown(Path file) {
         try {
-            List<String> lines;
+            String lines;
             synchronized (fileMonitor) {
-                lines = Files.readAllLines(file);
+                lines = Files.lines(file).collect(Collectors.joining("\n"));
             }
-            return new PegDownProcessor().markdownToHtml(lines.stream().collect(Collectors.joining("\n")));
+            return Parsers.parseMarkdown(lines);
         } catch (IOException e) {
             throw new AssertionError(e);
         }

@@ -1,10 +1,10 @@
 /**
  * @author Damien Chesneau
  */
-//var socket;
 
 var sendedLines;
 var token;
+var showHideBool = true;
 var eventBus = new vertx.EventBus("/eventbus/");
 eventBus.onopen = function () {
     console.log("Event bus connected !");
@@ -26,6 +26,17 @@ $.ajax({
     }
     displayExercise(msg.m);
 });
+
+function showHide(){
+    showHideBool = !showHideBool;
+    if(showHideBool){
+        $('.junitTest').show();
+        console.log("show");
+    }else{
+        $('.junitTest').hide();
+        console.log("hide");
+    }
+}
 
 function displayExercise(message) {
     for (var i = 0; i < message.length; i++) {

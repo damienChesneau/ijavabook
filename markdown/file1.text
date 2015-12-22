@@ -1,2 +1,8 @@
 ##**Exercice 2**##
 Coucou je suis lexo 1ssd
+
+<junit> int a = 4; int b = 4; a+b; </junit>
+
+Salut !
+
+<junitFile src="MainTest.java"/>
