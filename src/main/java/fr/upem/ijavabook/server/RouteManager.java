@@ -53,7 +53,6 @@ class RouteManager extends AbstractVerticle {
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.requestHandler(router::accept);
         httpServer.listen(Servers.SERVER_PORT);
-        exerciseSrv.startWatcher();
     }
 
     private BridgeOptions getBridgeOptions(ExerciseService exerciseService) {

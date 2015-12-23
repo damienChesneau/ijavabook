@@ -1,7 +1,6 @@
 package fr.upem.ijavabook.exmanager;
 
 import fr.upem.ijavabook.server.EventBusSender;
-import org.pegdown.PegDownProcessor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +8,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -21,75 +19,156 @@ import java.util.stream.Collectors;
  */
 class ExerciseImpl implements ExerciseService {
 
-    private final HashMap<Path, HtmlObservable> htmlRepresentation = new HashMap<>();
-    private final Thread watcher;
+    private final HashMap<Path, EncapsulatePlayingData> htmlRepresentation = new HashMap<>();
     private final Path rootDirectory;
     private final Object monitor = new Object();
     private final Object fileMonitor = new Object();
     private final EventBusSender eventBusSender;
 
+    /**
+     * Create a new implementation of ExerciseService.
+     *
+     * @param rootDirectory  a java.nio.file.Path class represents the directory of exercises.
+     * @param eventBusSender a fr.upem.ijavabook.server.EventBusSender class represent a way to notify update of a file.
+     */
     ExerciseImpl(Path rootDirectory, EventBusSender eventBusSender) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.eventBusSender = Objects.requireNonNull(eventBusSender);
-        this.watcher = Objects.requireNonNull(new Thread(new Watcher(rootDirectory, this::updateExercise)));
-        // to be reformated with an other englobing class.
+    }
+
+    /**
+     * Immutable class define to manage numbers of a file actually used.
+     * With this files don't used will be remove of memory.
+     */
+    private static class EncapsulatePlayingData {
+        private final String htmlRepresentation;
+        private final int nbClients;
+
+        /**
+         * Represents file content and numbers of clients reading it.
+         * With this constructor only one client number are define to 1.
+         * @param htmlRepresentation java.lang.String representation of html content.
+         */
+        private EncapsulatePlayingData(String htmlRepresentation) {
+            this(htmlRepresentation, 1);
+        }
+
+        /**
+         * Represents file content and numbers of clients reading it.
+         * @param htmlRepresentation java.lang.String representation of html content.
+         * @param nbClients int define numbers of clients actually reading.
+         */
+        private EncapsulatePlayingData(String htmlRepresentation, int nbClients) {
+            if (nbClients <= 0) {
+                throw new IllegalArgumentException("Send a positive value.");
+            }
+            this.htmlRepresentation = Objects.requireNonNull(htmlRepresentation);
+            this.nbClients = nbClients;
+        }
+
+        /**
+         * Increment the number of clients actually reading.
+         * @return new instance of EncapsulatePlayingData.
+         */
+        private EncapsulatePlayingData incrementClients() {
+            return new EncapsulatePlayingData(htmlRepresentation, nbClients + 1);
+        }
+        /**
+         * Decrement the number of clients actually reading.
+         * @throws IllegalStateException if decrementing will pass the count to zero.
+         * @return new instance of EncapsulatePlayingData.
+         */
+        private EncapsulatePlayingData decrementClients() {
+            if (nbClients == 1) {
+                throw new IllegalStateException("Zero clients of this element.");
+            }
+            return new EncapsulatePlayingData(htmlRepresentation, nbClients - 1);
+        }
+        /**
+         * Update the html representation.
+         * @return new instance of EncapsulatePlayingData.
+         */
+        private EncapsulatePlayingData setHtmlRepresentation(String htmlRepresentation) {
+            return new EncapsulatePlayingData(htmlRepresentation, nbClients);
+        }
     }
 
     @Override
-    public String getExercise(Path file, Observer observer) {
-        HtmlObservable html;
+    public String playExercise(Path file) {
         synchronized (monitor) {
-            html = htmlRepresentation.computeIfAbsent(file.toAbsolutePath(), (str) -> new HtmlObservable(getHtmlOfAMarkdown(str)));
+            return htmlRepresentation.compute(file.getFileName(), (path, encapsulatePlayingData) -> {
+                if (encapsulatePlayingData == null) {
+                    return new EncapsulatePlayingData(this.getHtmlOfAMarkdown(path));
+                } else {
+                    return encapsulatePlayingData.incrementClients();
+                }
+            }).htmlRepresentation;
         }
-        return html.getHtml();
+    }
+
+    @Override
+    public void closeExercise(Path file) {
+        file = file.getFileName();
+        synchronized (monitor) {
+            EncapsulatePlayingData encapsulatePlayingData = Objects.requireNonNull(htmlRepresentation.get(file), "The file you want's to close was never open :( ");
+            try {
+                htmlRepresentation.replace(file, encapsulatePlayingData.decrementClients());
+            } catch (IllegalStateException e) {
+                htmlRepresentation.remove(file);
+            }
+        }
     }
 
     private void updateExercise(Path file) {
-        String trad = getHtmlOfAMarkdown(file);
         synchronized (monitor) {
-            htmlRepresentation.computeIfPresent(file.toAbsolutePath(), (key, value) -> {
-                value.setHtmlTranslation(trad);
-                eventBusSender.send(key, trad);
-                return value;
+            htmlRepresentation.computeIfPresent(file.getFileName(), (key, value) -> {
+                String newTranslation = getHtmlOfAMarkdown(file);
+                EncapsulatePlayingData encapsulatePlayingData = value.setHtmlRepresentation(newTranslation);
+                eventBusSender.send(key, newTranslation);
+                return encapsulatePlayingData;
             });
         }
     }
 
-    @Override
+    /**
+     * Start the watcher on the folder passed in constructor.
+     */
     public void startWatcher() {
-        watcher.start();
+        Thread threadWatcherOnRepository = new Thread(new Watcher(rootDirectory, this::updateExercise));
+        threadWatcherOnRepository.start();
     }
 
     @Override
-    public void stopWatcher() {
-        watcher.interrupt();
-    }
-
-    @Override
-    public List<Path> getAllByDirectory(Path path) {
+    public List<Path> getAllByDirectory() {
         try {
-            return Files.list(path).collect(Collectors.toList());
+            return Files.list(rootDirectory).filter(this::filterMarkdownFile).collect(Collectors.toList());
         } catch (IOException e) {
             Logger.getLogger(ExerciseImpl.class.getName()).log(Level.SEVERE, "Can't get all paths.");
             throw new AssertionError();
         }
     }
 
+    private boolean filterMarkdownFile(Path path) {
+        String markdownExtension = ".text";
+        return path.getFileName().toString().contains(markdownExtension);
+    }
+
     @Override
     public List<String> getFilesNamesWithoutExtension() {
-        List<Path> allByDirectory = this.getAllByDirectory(rootDirectory);
+        int sizeOfExtension = 5;
+        List<Path> allByDirectory = this.getAllByDirectory();
         return allByDirectory.stream()
+                .filter(this::filterMarkdownFile)
                 .map((path -> path.getFileName().toString()))
-                .map((filename) -> filename.substring(0, filename.length() - 5))
+                .map((filename) -> filename.substring(0, filename.length() - sizeOfExtension))
                 .collect(Collectors.<String>toList());
-
     }
 
     private String getHtmlOfAMarkdown(Path file) {
         try {
             String lines;
             synchronized (fileMonitor) {
-                lines = Files.lines(file).collect(Collectors.joining("\n"));
+                lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"));
             }
             return Parsers.parseMarkdown(lines);
         } catch (IOException e) {
@@ -97,10 +176,4 @@ class ExerciseImpl implements ExerciseService {
         }
     }
 
-    @Override
-    public void removeObserver(Observer observer) {
-        synchronized (monitor) {
-            htmlRepresentation.forEach((key, value) -> value.deleteObserver(observer));
-        }
-    }
 }

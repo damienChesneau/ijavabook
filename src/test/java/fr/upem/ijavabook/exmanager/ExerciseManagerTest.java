@@ -18,7 +18,7 @@ public class ExerciseManagerTest {
     public void dev() {
         Path path = Paths.get("markdown", "file.text");
         System.out.println(path.toAbsolutePath());
-        // Exercises.getExerciseSrv().getExercise(path);
+        // Exercises.getExerciseSrv().playExercise(path);
         assertEquals("", "");
     }
 }

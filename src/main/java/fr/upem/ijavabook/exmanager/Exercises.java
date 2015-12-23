@@ -10,16 +10,23 @@ import java.nio.file.Path;
  * @author Damien Chesneau
  */
 public class Exercises {
-
+    /**
+     * No you can't construct...
+     * But a wonderful static method is present :)
+     */
     private Exercises() {
     }
 
     /**
-     * Hide implementation of a singleton exercise.
+     * Hide implementation of exercise service and create a watcher on directory.
      *
+     * @param rootDirectory java.nio.file.Path
+     * @param eventBusSender fr.upem.ijavabook.server.EventBusSender representing a way to update clients exercise in live !
      * @return An implementation to get your exercises.
      */
     public static ExerciseService getExerciseSrv(Path rootDirectory, EventBusSender eventBusSender) {
-        return new ExerciseImpl(rootDirectory, eventBusSender);
+        ExerciseImpl exercise = new ExerciseImpl(rootDirectory, eventBusSender);
+        exercise.startWatcher();
+        return exercise;
     }
 }

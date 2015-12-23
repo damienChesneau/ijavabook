@@ -13,36 +13,31 @@ public interface ExerciseService {
     /**
      * Get content of exercise.
      *
-     * @param file Path to text file.
+     * @param file java.nio.file.Path to text file.
      * @return HTML representation.
      */
-    String getExercise(Path file, Observer observer);
-
-
-    /**
-     * Start the watcher on the repertory.
-     */
-    void startWatcher();
+    String playExercise(Path file);
 
     /**
-     * Stop the watcher on the repertory.
-     */
-    void stopWatcher();
-
-    /**
-     * Remove an observer from the data map.
+     * When a client no longer need a exercise you can close it.
      *
-     * @param observer an instance of observer.
+     * @param file a java.nio.file.Path class represent the file to close.
      */
-    void removeObserver(Observer observer);
+    void closeExercise(Path file);
 
     /**
      * Get all files and put her in a list.
+     * All element is not a markdown file are filtred.
      *
-     * @param path of the directory.
      * @return a list of markdown files.
      */
-    List<Path> getAllByDirectory(Path path);
+    List<Path> getAllByDirectory();
 
+    /**
+     * Returns names of all exercises present in root directory.
+     * All element is not a markdown file are filtred.
+     *
+     * @return a list of exercises names.
+     */
     List<String> getFilesNamesWithoutExtension();
 }

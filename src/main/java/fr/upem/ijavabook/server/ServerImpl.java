@@ -1,7 +1,6 @@
 package fr.upem.ijavabook.server;
 
 import fr.upem.ijavabook.exmanager.ExerciseService;
-import fr.upem.ijavabook.exmanager.Exercises;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.server.manageclients.Client;
 import fr.upem.ijavabook.server.manageclients.ClientsManager;
@@ -11,11 +10,13 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implentation how controls all of server flux.
@@ -24,33 +25,43 @@ import java.util.stream.Collectors;
  */
 class ServerImpl implements Server {
 
-    private final Vertx web_srv = Vertx.vertx();
+    private final Vertx webSrv = Vertx.vertx();
     private final ClientsManager clientsManager = new ClientsManager();
     private final Path rootDirectory;
-    private final RouteManager routeManager;
 
     ServerImpl(Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
         System.setProperty("vertx.disableFileCaching", "true");//DEV
-        routeManager = initRouteManage();
+    }
+
+    @Override
+    public String start() {
+        RouteManager routeManager = initRouteManage();
+        webSrv.deployVerticle(routeManager);
+        return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
     private RouteManager initRouteManage() {
         ArrayList<Route> routes = new ArrayList<>();
         routes.add(new Route("/getallexercices/", this::getAllExerciseHandle, RequestType.GET));
         routes.add(new Route("/exercice/", this::getExercise, RequestType.POST));
+        routes.add(new Route("/closeexercice/", this::closeExercise, RequestType.POST));
         routes.add(new Route("/javacode/", this::getJavaCode, RequestType.POST));
         return new RouteManager(routes, rootDirectory);
     }
 
-    @Override
-    public String start() {
-        web_srv.deployVerticle(routeManager);
-        return "http://localhost:" + Servers.SERVER_PORT + "/";
+    private void closeExercise(RoutingContext routingContext, ExerciseService exerciseService) {
+        routingContext.request().bodyHandler(event -> {
+            TransactionParser<ArrayList<String>> vals = TransactionParser.parseAsObject(event.toString());
+            Path exerciseOfClient = Paths.get(vals.getMessage().get(1) + ".text");
+            exerciseService.closeExercise(exerciseOfClient);
+            int token = Integer.parseInt(vals.getMessage().get(0));
+            clientsManager.rmClient(token);
+        });
     }
 
     public void getAllExerciseHandle(RoutingContext routingContext, ExerciseService exerciseService) {
-        List<Path> allByDirectory = exerciseService.getAllByDirectory(rootDirectory);
+        List<Path> allByDirectory = exerciseService.getAllByDirectory();
         List<String> filesNames = allByDirectory.stream().map((file) -> {
             String filename = file.getFileName().toString();
             return filename.substring(0, filename.length() - 5);
@@ -61,9 +72,10 @@ class ServerImpl implements Server {
     }
 
     private void getExercise(RoutingContext routingContext, ExerciseService exerciseService) {
-        int token = clientsManager.newClient();
         routingContext.request().bodyHandler(event -> {
-            String exercise = exerciseService.getExercise(rootDirectory.resolve(event.toString() + ".text").normalize(), null/* clientsManager.getObserver(token)*/);
+            Path exerciseOfClient = Paths.get(event.toString() + ".text");
+            int token = clientsManager.newClient(exerciseOfClient);
+            String exercise = exerciseService.playExercise(exerciseOfClient.normalize());
             ArrayList<String> response = new ArrayList<>();
             response.add(new TransactionParser(TransactionPattern.RESPONSE_NEW_TOKEN, token).toJson());
             response.add(new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise).toJson());
@@ -95,7 +107,7 @@ class ServerImpl implements Server {
 
     @Override
     public void stop() {
-        web_srv.close();
+        webSrv.close();
     }
 
 }

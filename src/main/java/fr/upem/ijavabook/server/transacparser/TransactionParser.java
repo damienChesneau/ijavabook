@@ -54,12 +54,18 @@ public class TransactionParser<T> {
      * @param query
      * @return
      */
-    public static TransactionParser parseAsObject(String query) {
+    public static <T> TransactionParser<T> parseAsObject(String query) {
         Objects.requireNonNull(query);
         JsonObject json = new JsonObject(query);
         String tpAsStr = json.getString(TransactionPattern.TYPE_PATTERN.getTranslation());
-        String message = json.getString(TransactionPattern.MESSAGE_PATTERN.getTranslation());
-        return new TransactionParser(TransactionPattern.getByTranslation(tpAsStr), message);
+        try {
+            JsonArray jsonArray = json.getJsonArray(TransactionPattern.MESSAGE_PATTERN.getTranslation());
+            List list = jsonArray.getList();
+            return new TransactionParser<T>(TransactionPattern.getByTranslation(tpAsStr), (T) list);
+        } catch (ClassCastException e) {
+            T message = (T) json.getValue(TransactionPattern.MESSAGE_PATTERN.getTranslation());
+            return new TransactionParser<T>(TransactionPattern.getByTranslation(tpAsStr), message); // TO REFORMAT
+        }
     }
 
     public static TransactionParser parseAsObject(LinkedHashMap query) {

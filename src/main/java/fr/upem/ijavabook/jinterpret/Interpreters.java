@@ -11,13 +11,18 @@ import java.nio.file.Path;
  * @author Damien Chesneau
  */
 public class Interpreters {
+    /**
+     * See static method :
+     * public static Interpreter getJavaInterpreter();
+     */
     private Interpreters() {
     }
 
     /**
      * Get implementation of java interpreter designed for are easy to use.
-     * @throws Error if io exception in output files.
+     *
      * @return java interpreter.
+     * @throws Error if io exception in output files.
      */
     public static Interpreter getJavaInterpreter() {
         try {

@@ -13,7 +13,6 @@ eventBus.onopen = function () {
     });
 };
 
-
 $.ajax({
     dataType: "json",
     method: "POST",
@@ -27,12 +26,12 @@ $.ajax({
     displayExercise(msg.m);
 });
 
-function showHide(){
+function showHide() {
     showHideBool = !showHideBool;
-    if(showHideBool){
+    if (showHideBool) {
         $('.junitTest').show();
         console.log("show");
-    }else{
+    } else {
         $('.junitTest').hide();
         console.log("hide");
     }
@@ -61,6 +60,16 @@ function send(message) {
         dataType: "json",
         method: "POST",
         url: "/javacode",
+        data: JSON.stringify(message)
+    }).done(function (msg) {
+        manageSingleLineConsole(msg.m);
+    });
+}
+function sendOnClose(message) {
+    $.ajax({
+        dataType: "json",
+        method: "POST",
+        url: "/closeexercice",
         data: JSON.stringify(message)
     }).done(function (msg) {
         manageSingleLineConsole(msg.m);
@@ -104,3 +113,7 @@ function getParameterByName(name) {
     console.log(results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " ")));
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
+
+$(window).bind('beforeunload', function (e) {
+    sendOnClose(placeValueInReq("cex", new Array(""+token, getParameterByName("value"))));
+});

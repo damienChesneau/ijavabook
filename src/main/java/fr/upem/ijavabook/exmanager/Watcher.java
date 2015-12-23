@@ -14,7 +14,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
  *
  * @author Damien Chesneau
  */
-class Watcher implements Runnable{
+class Watcher implements Runnable {
     private final Path directory;
     private final boolean showHideFiles;
     private final HashMap<String, Consumer<Path>> calls;
@@ -46,11 +46,11 @@ class Watcher implements Runnable{
 
     private void launch() throws IOException, InterruptedException {
         while (!Thread.interrupted()) {
-            for (WatchEvent event : initializer().pollEvents()) {
+            initializer().pollEvents().forEach(event -> {
                 if (testHiddenFiles().test(event.context().toString())) {
                     callUserLambda(event);
                 }
-            }
+            });
         }
     }
 
@@ -70,7 +70,7 @@ class Watcher implements Runnable{
         Consumer<Path> consumer = calls.getOrDefault(event.kind().toString(), (cs) -> {
         });
         Path resolve = directory.resolve((event.context().toString())).normalize();
-        if(Files.exists(resolve)){
+        if (Files.exists(resolve)) {
             consumer.accept(resolve);
         }
     }
