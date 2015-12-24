@@ -3,6 +3,7 @@ package fr.upem.ijavabook.server.manageclients;
 import fr.upem.ijavabook.jinterpret.InterpretedLine;
 import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
+import fr.upem.ijavabook.jinterpret.JunitTestResult;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -46,5 +47,10 @@ public class Client implements Interpreter {
     @Override
     public void close() {
         interpreter.close();
+    }
+
+    @Override
+    public JunitTestResult test(String line) {
+        return interpreter.test(line);
     }
 }

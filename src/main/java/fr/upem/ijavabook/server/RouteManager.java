@@ -64,11 +64,6 @@ class RouteManager extends AbstractVerticle {
         return bridgeOptions;
     }
 
-    @Override
-    public void stop() {
-//        threadPool.shutdown();
-    }
-
     private void onlyCurrentComputer(String host) {
         if (!("localhost:" + Servers.SERVER_PORT).equals(host)) {
             throw new IllegalAccessError("Client are not allow to read this.");

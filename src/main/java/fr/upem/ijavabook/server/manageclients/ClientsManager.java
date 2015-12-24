@@ -44,11 +44,12 @@ public class ClientsManager {
      * @return a Client.
      */
     public Client getClientByToken(int token) {
+        Client client;
         synchronized (lock) {
-            Client client = connections.get(token);
-            validateClient(client);
-            return client;
+            client = connections.get(token);
         }
+        validateClient(client);
+        return client;
     }
 
     /**
@@ -57,12 +58,13 @@ public class ClientsManager {
      * @param token int
      */
     public void rmClient(int token) {
+        Client client;
         synchronized (lock) {
-            Client client = connections.get(token);
-            validateClient(client);
-            client.close();
+            client = connections.get(token);
             connections.remove(token);
         }
+        validateClient(client);
+        client.close();
     }
 
     private void validateClient(Client client) {

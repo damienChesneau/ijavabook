@@ -31,7 +31,9 @@ public class Interpreters {
             PrintStream sNominal = new PrintStream(Files.newOutputStream(tmpFile));
             PrintStream sError = new PrintStream(Files.newOutputStream(tmpErrFile));
             JShell jshell = JShell.builder().out(sNominal).err(sError).build();
-            return new JShellInterpreter(tmpFile, tmpErrFile, sNominal, sError, jshell);
+            JShellInterpreter jShellInterpreter = new JShellInterpreter(tmpFile, tmpErrFile, sNominal, sError, jshell);
+            jShellInterpreter.interpret("import org.junit.*;");
+            return jShellInterpreter;
         } catch (IOException e) {
             throw new Error("Unable to get Java interpreter :(");
         }

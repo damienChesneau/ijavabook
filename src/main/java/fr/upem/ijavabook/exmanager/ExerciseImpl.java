@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -19,11 +20,12 @@ import java.util.stream.Collectors;
  */
 class ExerciseImpl implements ExerciseService {
 
-    private final HashMap<Path, EncapsulatePlayingData> htmlRepresentation = new HashMap<>();
+    private final ConcurrentHashMap<Path, EncapsulatePlayingData> htmlRepresentation = new ConcurrentHashMap<>();
     private final Path rootDirectory;
     private final Object monitor = new Object();
     private final Object fileMonitor = new Object();
     private final EventBusSender eventBusSender;
+    private final Parser parser = new Parser();
 
     /**
      * Create a new implementation of ExerciseService.
@@ -168,9 +170,9 @@ class ExerciseImpl implements ExerciseService {
         try {
             String lines;
             synchronized (fileMonitor) {
-                lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"));
+                while((lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"))).isEmpty());
             }
-            return Parsers.parseMarkdown(lines);
+            return parser.parseMarkdown(lines);
         } catch (IOException e) {
             throw new AssertionError(e);
         }

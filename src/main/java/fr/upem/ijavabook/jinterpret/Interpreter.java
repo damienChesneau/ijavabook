@@ -41,4 +41,6 @@ public interface Interpreter extends AutoCloseable {
      */
     @Override
     void close();
+
+    JunitTestResult test(String line);
 }

@@ -55,14 +55,14 @@ function actionOnResponse(jsonMessage) {
     }
 }
 
-function send(message) {
+function send(url,message,callback) {
     $.ajax({
         dataType: "json",
         method: "POST",
-        url: "/javacode",
+        url: url,
         data: JSON.stringify(message)
     }).done(function (msg) {
-        manageSingleLineConsole(msg.m);
+        callback(msg.m);
     });
 }
 function sendOnClose(message) {
@@ -80,14 +80,29 @@ function placeValueInReq(type, value) {
     return {"t": type, "m": value};
 }
 
+function sendJavaTest(code,result){
+    var content = code.text().replace(/\r\n|\r|\n/g, "\\n");
+    var jsonArray = new Array();
+    jsonArray.push(placeValueInReq("to", token));
+    jsonArray.push(placeValueInReq("rjt", '{'+content+'}'));
+    placeValueInReq("rjt", jsonArray);
+    send("/junittest",jsonArray,function(m){
+        if(m == 'FAIL'){
+            result.css('color','red');
+        }else{
+            result.css('color','green');
+        }
+    });
+}
+
 function sendJavaCode(code) {
     var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
     sendedLines = code.val().split("\n");
     var jsonArray = new Array();
     jsonArray.push(placeValueInReq("to", token));
     jsonArray.push(placeValueInReq("jc", (content)));
-    placeValueInReq("tjc", jsonArray);
-    send(jsonArray);
+    placeValueInReq("jc", jsonArray);
+    send("/javacode",jsonArray,manageSingleLineConsole);
 }
 
 function verifyCode(line) {

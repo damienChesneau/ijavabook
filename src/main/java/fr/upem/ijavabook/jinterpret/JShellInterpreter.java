@@ -72,4 +72,12 @@ class JShellInterpreter implements Interpreter {
             throw new Error("Unable to clean temporary output files.");
         }
     }
+
+    @Override
+    public JunitTestResult test(String line) {
+        if(interpret(line).getException().isEmpty()){
+           return JunitTestResult.SUCCESS;
+        }
+        return JunitTestResult.FAIL;
+    }
 }
