@@ -132,9 +132,10 @@ public class TransactionParser<T> {
 
         private JsonArray jsonArrayForLine(InterpretedLine il) {
             JsonArray ja = new JsonArray();
-            ja.add(il.getValue());
-            ja.add(il.isValid());
-            return ja.add(il.getException());
+            String exception = il.getException();
+            String value = il.getValue();
+            ja.add(value).add(!value.isEmpty() | exception.isEmpty()).add(il.getException());
+            return ja;
         }
 
         public TransactionParser build() {

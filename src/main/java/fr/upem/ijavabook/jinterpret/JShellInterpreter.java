@@ -1,6 +1,7 @@
 package fr.upem.ijavabook.jinterpret;
 
 import jdk.jshell.JShell;
+import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 
 import java.io.IOException;
@@ -38,7 +39,13 @@ class JShellInterpreter implements Interpreter {
     public InterpretedLine interpret(String line) {
         List<SnippetEvent> eval = jShell.eval(line);
         Exception e = eval.get(0).exception();
-        return new InterpretedLine(eval.get(0).value(), (e != null) ? e.toString() : "",
+        String exception = "";
+        if(eval.get(0).status() == Snippet.Status.REJECTED){
+            exception = "Invalid syntax.";
+        }else if(e != null){
+            exception = e.toString();
+        }
+        return new InterpretedLine(eval.get(0).value(),exception,
                 eval.get(0).status().name().equals("VALID"));
     }
 

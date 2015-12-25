@@ -96,7 +96,9 @@ function sendJavaTest(code,result){
 }
 
 function sendJavaCode(code) {
-    var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
+    //var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
+    var content = code.val().replace(/\r/g, "\\n");
+    content = content.replace("\n", "");
     sendedLines = code.val().split("\n");
     var jsonArray = new Array();
     jsonArray.push(placeValueInReq("to", token));
@@ -114,9 +116,15 @@ function replaceAll(str, find, replace) {
 }
 function manageSingleLineConsole(message) {
     $("#output").html(message[0][0]);
+    var sended = sendedLines[0];
+    for(var i =1; i<sendedLines.length;i++){
+        sended += '<br/>'+sendedLines[i];
+    }
+
     for (var i = 1; i < message.length; i++) {
-        $("#console").append("<p style=\"color: " + ((message[i][1] == true) ? 'green' : 'red') + "\" >" + sendedLines[i - 1] +
-            ((message[1][1] == true && message[i][0] != "") ? " Expression value =" + message[i][0] : "") + "</p>");
+        console.log(sendedLines.toString());
+        $("#console").append("<p>" + sended + "<br/><span  style=\"color: " + ((message[i][1] == true) ? 'green' : 'red') + "\">"+
+            ((message[1][1] == true && message[i][0] != "") ? ": "+ message[i][0] : message[i][2]) + "</span></p>");
     }
     $("#javacode").val("");
 }

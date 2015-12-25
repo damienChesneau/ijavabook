@@ -46,26 +46,29 @@ class ServerImpl implements Server {
 
     private RouteManager initRouteManage() {
         ArrayList<Route> routes = new ArrayList<>();
-        routes.add(new Route("/getallexercices/", this::getAllExerciseHandle, RequestType.GET));
-        routes.add(new Route("/exercice/", this::getExercise, RequestType.POST));
-        routes.add(new Route("/closeexercice/", this::closeExercise, RequestType.POST));
-        routes.add(new Route("/javacode/", this::getJavaCode, RequestType.POST));
-        routes.add(new Route("/junittest/",this::executeTest,RequestType.POST));
+        routes.add(new Route("/getallexercices/", (r,e)-> executeInThread(r,e,this::getAllExerciseHandle), RequestType.GET));
+        routes.add(new Route("/exercice/", (r,e)-> executeInThread(r,e,this::getExercise), RequestType.POST));
+        routes.add(new Route("/closeexercice/", (r,e)-> executeInThread(r,e,this::closeExercise), RequestType.POST));
+        routes.add(new Route("/javacode/", (r,e)-> executeInThread(r,e,this::getJavaCode), RequestType.POST));
+        routes.add(new Route("/junittest/",(r,e)-> executeInThread(r,e,this::executeTest),RequestType.POST));
         return new RouteManager(routes, rootDirectory);
     }
 
+    private void executeInThread(RoutingContext routingContext, ExerciseService exerciseService, Route.EventWithExercise eventWithExercise){
+        /*threadPool.execute(()->*/eventWithExercise.doAction(routingContext,exerciseService)/*)*/;
+    }
+
     private void closeExercise(RoutingContext routingContext, ExerciseService exerciseService) {
-        threadPool.execute(()-> routingContext.request().bodyHandler(event -> {
+        /*threadPool.execute(()-> */routingContext.request().bodyHandler(event -> {
             TransactionParser<ArrayList<String>> vals = TransactionParser.parseAsObject(event.toString());
             Path exerciseOfClient = Paths.get(vals.getMessage().get(1) + ".text");
             exerciseService.closeExercise(exerciseOfClient);
             int token = Integer.parseInt(vals.getMessage().get(0));
             clientsManager.rmClient(token);
-        }));
+        })/*)*/;
     }
 
     public void getAllExerciseHandle(RoutingContext routingContext, ExerciseService exerciseService) {
-        threadPool.execute(()-> {
             List<Path> allByDirectory = exerciseService.getAllByDirectory();
             List<String> filesNames = allByDirectory.stream().map((file) -> {
                 String filename = file.getFileName().toString();
@@ -74,11 +77,11 @@ class ServerImpl implements Server {
             routingResponse(routingContext, TransactionParser
                     .builderJavaList(TransactionPattern.RESPONSE_GET_ALL)
                     .setList(filesNames).build());
-        });
+        //});
     }
 
     private void getExercise(RoutingContext routingContext, ExerciseService exerciseService) {
-        threadPool.execute(()-> routingContext.request().bodyHandler(event -> {
+        /*threadPool.execute(()-> */routingContext.request().bodyHandler(event -> {
             Path exerciseOfClient = Paths.get(event.toString() + ".text");
             int token = clientsManager.newClient(exerciseOfClient);
             String exercise = exerciseService.playExercise(exerciseOfClient.normalize());
@@ -89,11 +92,11 @@ class ServerImpl implements Server {
                     .builderJavaList(TransactionPattern.RESPONSE_TOKEN_EXERCISE)
                     .setList(response)
                     .build());
-        }));
+        })/*)*/;
     }
 
     private void getJavaCode(RoutingContext routingContext, ExerciseService exerciseService) {
-        threadPool.execute(()-> routingContext.request().bodyHandler(event -> {
+        /*threadPool.execute(()->*/ routingContext.request().bodyHandler(event -> {
             HashMap<TransactionPattern, String> requestParameters = parseJavaCodeRequest(event.toString());
             Client clientByToken = getClient(requestParameters);
             InterpretedLine interpreted = clientByToken.interpret(requestParameters.get(TransactionPattern.REQUEST_JAVA_CODE));
@@ -101,16 +104,16 @@ class ServerImpl implements Server {
                     .builderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT, clientByToken.getOutput())
                     .setInterpretedLine(interpreted)
                     .build());
-        }));
+        })/*)*/;
     }
 
     private void executeTest(RoutingContext routingContext, ExerciseService exerciseService) {
-        threadPool.execute(()-> routingContext.request().bodyHandler(event -> {
+        /*threadPool.execute(()->*/ routingContext.request().bodyHandler(event -> {
             HashMap<TransactionPattern, String> requestParameters = parseJavaCodeRequest(event.toString());
             Client clientByToken = getClient(requestParameters);
             JunitTestResult result = clientByToken.test(requestParameters.get(TransactionPattern.REQUEST_JUNIT_TEST));
             routingResponse(routingContext,new TransactionParser(TransactionPattern.RESPONSE_JUNIT_RESULT, result.name()));
-        }));
+        })/*)*/;
     }
 
     private void routingResponse(RoutingContext routingContext,TransactionParser transactionParser){
