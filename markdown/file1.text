@@ -1,7 +1,11 @@
 ##**Exercice 2**##
 Coucou je suis lexo 1
 
-<junit> int a = 4; int b = 4; a+b; </junit>
+<junit>
+int a = 4;
+int b = 4;
+a+b;
+</junit>
 
 Salut !
 

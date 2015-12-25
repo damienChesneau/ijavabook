@@ -81,7 +81,9 @@ function placeValueInReq(type, value) {
 }
 
 function sendJavaTest(code,result){
-    var content = code.text().replace(/\r\n|\r|\n/g, "\\n");
+    var content = code.text().replace(/\r/g, "\\n");
+    content = content.replace("\n", "");
+    console.log(content);
     var jsonArray = new Array();
     jsonArray.push(placeValueInReq("to", token));
     jsonArray.push(placeValueInReq("rjt", '{'+content+'}'));
