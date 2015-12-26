@@ -18,11 +18,11 @@ import java.util.Objects;
  */
 public class Client implements Interpreter {
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
-    private final Path exercice;
+    //private final Path exercice;
 
-    public Client(Path exercise) {
+    /*public Client(Path exercise) {
         this.exercice = Objects.requireNonNull(exercise);
-    }
+    }*/
 
     @Override
     public InterpretedLine interpret(String line) {

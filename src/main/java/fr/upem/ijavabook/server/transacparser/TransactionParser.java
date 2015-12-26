@@ -51,8 +51,8 @@ public class TransactionParser<T> {
     /**
      * static factory to parseAsObject your json object to POJO.
      *
-     * @param query
-     * @return
+     * @param query Request to parse as an Json object
+     * @return return the corresponding transaction parser
      */
     public static <T> TransactionParser<T> parseAsObject(String query) {
         Objects.requireNonNull(query);
@@ -61,25 +61,25 @@ public class TransactionParser<T> {
         try {
             JsonArray jsonArray = json.getJsonArray(TransactionPattern.MESSAGE_PATTERN.getTranslation());
             List list = jsonArray.getList();
-            return new TransactionParser<T>(TransactionPattern.getByTranslation(tpAsStr), (T) list);
+            return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), (T) list);
         } catch (ClassCastException e) {
             T message = (T) json.getValue(TransactionPattern.MESSAGE_PATTERN.getTranslation());
-            return new TransactionParser<T>(TransactionPattern.getByTranslation(tpAsStr), message); // TO REFORMAT
+            return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), message); // TO REFORMAT
         }
     }
 
-    public static TransactionParser parseAsObject(LinkedHashMap query) {
+    /*public static TransactionParser parseAsObject(LinkedHashMap query) {
         Objects.requireNonNull(query);
         String tpAsStr = String.valueOf(query.get(TransactionPattern.TYPE_PATTERN.getTranslation()));
         String message = String.valueOf(query.get(TransactionPattern.MESSAGE_PATTERN.getTranslation()));
         return new TransactionParser(TransactionPattern.getByTranslation(tpAsStr), message);
-    }
+    }*/
 
     /**
      * static factory to parseAsObject your json object to POJO.
      *
-     * @param query
-     * @return
+     * @param query Request to pars as a json array object.
+     * @return return the corresponding transaction parser
      */
     public static List<TransactionParser<String>> parseAsArray(String query) {
         Objects.requireNonNull(query);
@@ -89,15 +89,15 @@ public class TransactionParser<T> {
         for (LinkedHashMap lhp : list) {
             String message = String.valueOf(lhp.get("m"));
             TransactionPattern type = TransactionPattern.getByTranslation(String.valueOf(lhp.get("t")));
-            parsed.add(new TransactionParser<String>(type, message));
+            parsed.add(new TransactionParser<>(type, message));
         }
 
         return parsed;
     }
 
-    public static BuilderJavaInterpreted builderJavaInterpreted(TransactionPattern type, String output) {
+    /*public static BuilderJavaInterpreted builderJavaInterpreted(TransactionPattern type, String output) {
         return new BuilderJavaInterpreted(type, output);
-    }
+    }*/
 
     public static BuilderJavaInterpreted builderJavaInterpreted(TransactionPattern type, List<String> output) {
         return new BuilderJavaInterpreted(type, output.stream().collect(Collectors.joining("</br>")));
@@ -105,8 +105,8 @@ public class TransactionParser<T> {
 
     public static class BuilderJavaInterpreted {
         private final TransactionPattern type;
-        private String message;
-        private List<InterpretedLine> ils;
+        /*private String message;
+        private List<InterpretedLine> ils;*/
         private InterpretedLine il;
         private String output;
 
@@ -115,7 +115,7 @@ public class TransactionParser<T> {
             this.output = Objects.requireNonNull(output);
         }
 
-        public BuilderJavaInterpreted setMessage(String message) {
+        /*public BuilderJavaInterpreted setMessage(String message) {
             this.message = message;
             return this;
         }
@@ -123,7 +123,7 @@ public class TransactionParser<T> {
         public BuilderJavaInterpreted setInterpretedLines(List<InterpretedLine> ils) {
             this.ils = ils;
             return this;
-        }
+        }*/
 
         public BuilderJavaInterpreted setInterpretedLine(InterpretedLine il) {
             this.il = il;
@@ -143,17 +143,17 @@ public class TransactionParser<T> {
             JsonArray jm = new JsonArray();
             jm.add(output);
             ja.add(jm);
-            if (message == null) {
-                if (il != null) {
+            /*if (message == null) {
+                if (il != null) {*/
                     ja.add(jsonArrayForLine(il));
-                } else {
+               /* } else {
                     List<JsonArray> str = ils.stream().map((li) -> jsonArrayForLine(li)).collect(Collectors.toList());
                     str.forEach((item) -> ja.add(item));
                 }
             } else {
                 ja.add(message);
-            }
-            return new TransactionParser(this.type, ja);
+            }*/
+            return new TransactionParser<>(this.type, ja);
         }
     }
 
@@ -176,8 +176,8 @@ public class TransactionParser<T> {
 
         public TransactionParser<JsonArray> build() {
             JsonArray arrayAsJson = new JsonArray();
-            genericList.forEach((itemGeneric) -> arrayAsJson.add(itemGeneric));
-            return new TransactionParser(this.type, arrayAsJson);
+            genericList.forEach(arrayAsJson::add);
+            return new TransactionParser<>(this.type, arrayAsJson);
         }
     }
 

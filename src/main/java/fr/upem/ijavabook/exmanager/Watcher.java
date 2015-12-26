@@ -39,10 +39,10 @@ class Watcher implements Runnable {
         return watcher.take();
     }
 
-    public void setOnUpdate(Consumer<Path> runUpdate) {
+    /*public void setOnUpdate(Consumer<Path> runUpdate) {
         Objects.requireNonNull(runUpdate);
         calls.put(ENTRY_MODIFY.name(), runUpdate);
-    }
+    }*/
 
     private void launch() throws IOException, InterruptedException {
         while (!Thread.interrupted()) {

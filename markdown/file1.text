@@ -1,8 +1,7 @@
 ##**Exercice 2**##
-Coucou je suis lexo 1
+Coucou je suis lexo 1 sale bouzeur !
 
-<junit>
-int a = 4;
+<junit>int a = 4;
 int b = 4;
 a+b;
 </junit>

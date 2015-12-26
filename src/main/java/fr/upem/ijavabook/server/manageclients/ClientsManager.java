@@ -1,8 +1,6 @@
 package fr.upem.ijavabook.server.manageclients;
 
-import java.nio.file.Path;
 import java.security.SecureRandom;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,12 +18,12 @@ public class ClientsManager {
 
     /**
      * Create a new client and return his token.
-     * @param exercise java.nio.file.Path ...
+     * exercise java.nio.file.Path ...
      * @return int token
      */
-    public int newClient(Path exercise) {
+    public int newClient(/*Path exercise*/) {
         int token = getNewToken();
-        connections.put(token, new Client(exercise));
+        connections.put(token, new Client(/*exercise*/));
         return token;
     }
 
@@ -37,7 +35,7 @@ public class ClientsManager {
 
     /**
      * Get a client by his token.
-     * @param token
+     * @param token token of the client
      * @throws IllegalArgumentException if client don't present.
      * @return a Client.
      */

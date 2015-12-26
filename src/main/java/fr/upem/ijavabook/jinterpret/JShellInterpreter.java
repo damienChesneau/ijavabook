@@ -32,21 +32,21 @@ class JShellInterpreter implements Interpreter {
 
     @Override
     public List<InterpretedLine> interpretAll(List<String> lines) {
-        return lines.stream().map((line) -> interpret(line)).collect(Collectors.<InterpretedLine>toList());
+        return lines.stream().map(this::interpret).collect(Collectors.<InterpretedLine>toList());
     }
 
     @Override
     public InterpretedLine interpret(String line) {
-        List<SnippetEvent> eval = jShell.eval(line);
-        Exception e = eval.get(0).exception();
+        SnippetEvent eval = jShell.eval(line).get(0);
+        Exception e = eval.exception();
         String exception = "";
-        if(eval.get(0).status() == Snippet.Status.REJECTED){
+        if(eval.status() == Snippet.Status.REJECTED){
             exception = "Invalid syntax.";
         }else if(e != null){
             exception = e.toString();
         }
-        return new InterpretedLine(eval.get(0).value(),exception,
-                eval.get(0).status().name().equals("VALID"));
+        return new InterpretedLine(eval.value(),exception/*,
+                eval.status().name().equals("VALID")*/);
     }
 
     @Override

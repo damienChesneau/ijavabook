@@ -1,7 +1,6 @@
 package fr.upem.ijavabook.server;
 
 import fr.upem.ijavabook.exmanager.ExerciseService;
-import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.Objects;

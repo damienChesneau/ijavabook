@@ -22,9 +22,10 @@ public class Servers {
      * @return a singleton of server controls.
      */
     public static Server getServer(Path rootDirectory) {
-        ServerImpl serverInstance = new ServerImpl(rootDirectory);
-//        serverInstance.getExerciseManager().startWatcher();
-        return serverInstance;
+        /*ServerImpl serverInstance = new ServerImpl(rootDirectory);
+        serverInstance.getExerciseManager().startWatcher();
+        return serverInstance;*/
+        return new ServerImpl(rootDirectory);
     }
 
 }

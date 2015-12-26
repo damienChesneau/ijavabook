@@ -82,11 +82,11 @@ class ServerImpl implements Server {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(()-> {
                     Path exerciseOfClient = Paths.get(event.toString() + ".text");
-                    int token = clientsManager.newClient(exerciseOfClient);
+                    int token = clientsManager.newClient(/*exerciseOfClient*/);
                     String exercise = exerciseService.playExercise(exerciseOfClient.normalize());
                     ArrayList<String> response = new ArrayList<>();
-                    response.add(new TransactionParser(TransactionPattern.RESPONSE_NEW_TOKEN, token).toJson());
-                    response.add(new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, exercise).toJson());
+                    response.add(new TransactionParser<>(TransactionPattern.RESPONSE_NEW_TOKEN, token).toJson());
+                    response.add(new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, exercise).toJson());
                     routingResponse(routingContext,TransactionParser
                             .builderJavaList(TransactionPattern.RESPONSE_TOKEN_EXERCISE)
                             .setList(response)
@@ -113,7 +113,7 @@ class ServerImpl implements Server {
                     HashMap<TransactionPattern, String> requestParameters = parseJavaCodeRequest(event.toString());
                     Client clientByToken = getClient(requestParameters);
                     JunitTestResult result = clientByToken.test(requestParameters.get(TransactionPattern.REQUEST_JUNIT_TEST));
-                    routingResponse(routingContext,new TransactionParser(TransactionPattern.RESPONSE_JUNIT_RESULT, result.name()));
+                    routingResponse(routingContext,new TransactionParser<>(TransactionPattern.RESPONSE_JUNIT_RESULT, result.name()));
                 }));
     }
 

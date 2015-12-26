@@ -2,9 +2,7 @@ package fr.upem.ijavabook.server;
 
 import fr.upem.ijavabook.server.transacparser.TransactionParser;
 import fr.upem.ijavabook.server.transacparser.TransactionPattern;
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonObject;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -25,6 +23,6 @@ class EventBusSenderImpl implements EventBusSender {
         Objects.requireNonNull(htmlContent);
         String filename = file.getFileName().toString();
         filename = filename.substring(0, filename.length() - 5);
-        eventBus.send(filename, new TransactionParser(TransactionPattern.RESPONSE_EXERCISE, htmlContent).toJson());
+        eventBus.send(filename, new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, htmlContent).toJson());
     }
 }

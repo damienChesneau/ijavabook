@@ -5,7 +5,6 @@ import fr.upem.ijavabook.exmanager.Exercises;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
@@ -70,10 +69,10 @@ class RouteManager extends AbstractVerticle {
         }
     }
 
-    public void sendMessage(String adresse, String message) {
+    /*public void sendMessage(String adresse, String message) {
         Objects.requireNonNull(adresse);
         Objects.requireNonNull(message);
         System.out.println(adresse);
         vertx.eventBus().publish(adresse, message);
-    }
+    }*/
 }
