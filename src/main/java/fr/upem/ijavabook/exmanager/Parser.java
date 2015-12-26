@@ -10,10 +10,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
+ * Parse a markdown string to a html string.
+ * This class is thread safe.
  * @author Steeve Sivanantham
  */
 public class Parser {
 
+    private int nextId = 0;
+    private final Object monitor = new Object();
+
+    /**
+     * Enum with all compiled pattern.
+     */
     enum ParserPattern{
         openJunitPattern("<\\s*junit\\s*>"),
         closeJunitPattern("<\\s*/\\s*junit\\s*>"),
@@ -27,17 +35,19 @@ public class Parser {
         }
     }
 
-    private int id = 0;
-    private final Object monitor = new Object();
+    /**
+     * Parse a markdown string to a html string.
+     * @param lines markdown string
+     * @return html string
+     */
+    public String parseMarkdown(String lines){
+        return new PegDownProcessor().markdownToHtml(replaceFileJunit(replaceEmbedJunit(lines)));
+    }
 
     private int getId(){
         synchronized (monitor){
-            return id ++;
+            return nextId ++;
         }
-    }
-
-    public String parseMarkdown(String lines){
-        return new PegDownProcessor().markdownToHtml(replaceFileJunit(replaceEmbedJunit(lines)));
     }
 
     private String replaceEmbedJunit(String html){
@@ -88,4 +98,6 @@ public class Parser {
         }
         return "</code></pre><button type=\"button\"class=\"btn btn-primary\" onclick=\"sendJavaTest(\\$('#junitTest"+id+"'),\\$('#junitPre"+id+"'))\">Test</button></div>";
     }
+
+
 }

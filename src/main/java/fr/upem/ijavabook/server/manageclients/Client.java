@@ -5,9 +5,7 @@ import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
 import fr.upem.ijavabook.jinterpret.JunitTestResult;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This class represent a client and her interpreter instance.
@@ -39,11 +37,11 @@ public class Client implements Interpreter {
         return interpreter.getOutput();
     }
 
-    @Override
+   /* @Override
     public List<String> getErrors() {
         return interpreter.getErrors();
     }
-
+*/
     @Override
     public void close() {
         interpreter.close();

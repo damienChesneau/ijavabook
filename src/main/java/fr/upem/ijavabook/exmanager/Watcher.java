@@ -19,11 +19,16 @@ class Watcher implements Runnable {
     private final boolean showHideFiles;
     private final HashMap<String, Consumer<Path>> calls;
 
+    /**
+     * Create a Watcher.
+     * @param directory repertory to watch
+     * @param onUpdate consumer to execute when a file change.
+     */
     Watcher(Path directory, Consumer<Path> onUpdate) {
         this(directory, onUpdate, false);
     }
 
-    Watcher(Path directory, Consumer<Path> onUpdate, boolean showHideFiles) {
+    private Watcher(Path directory, Consumer<Path> onUpdate, boolean showHideFiles) {
         if (!Files.isDirectory(Objects.requireNonNull(directory))) {
             throw new IllegalArgumentException("Please send a path of a directoy.");
         }

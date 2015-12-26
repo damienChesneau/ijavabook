@@ -28,13 +28,13 @@ public interface Interpreter extends AutoCloseable {
      * @return List of console lines.
      */
     List<String> getOutput();
-
+/*
     /**
      * Get output errors of your code inserted.
      *
      * @return List of console lines.
      */
-    List<String> getErrors();
+    /*List<String> getErrors();*/
 
     /**
      * You need doc to this ?
@@ -42,5 +42,10 @@ public interface Interpreter extends AutoCloseable {
     @Override
     void close();
 
+    /**
+     * Test a line with the JUnit API
+     * @param line Java code to be tested
+     * @return result of the Junit test
+     */
     JunitTestResult test(String line);
 }

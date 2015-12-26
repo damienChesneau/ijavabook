@@ -28,6 +28,7 @@ public class TransactionParser<T> {
         this.message = Objects.requireNonNull(message);
     }
 
+
     public T getMessage() {
         return message;
     }
@@ -99,10 +100,19 @@ public class TransactionParser<T> {
         return new BuilderJavaInterpreted(type, output);
     }*/
 
+    /**
+     * Builde a new BuilderJavaInterpreted
+     * @param type type of the transactionPattern
+     * @param output everylines of the interpreted output.
+     * @return
+     */
     public static BuilderJavaInterpreted builderJavaInterpreted(TransactionPattern type, List<String> output) {
         return new BuilderJavaInterpreted(type, output.stream().collect(Collectors.joining("</br>")));
     }
 
+    /**
+     * Builder class for transaction of InterpretedLine
+     */
     public static class BuilderJavaInterpreted {
         private final TransactionPattern type;
         /*private String message;
@@ -138,6 +148,10 @@ public class TransactionParser<T> {
             return ja;
         }
 
+        /**
+         * Build the TransactionParser
+         * @return TransactionParser with the current states.
+         */
         public TransactionParser build() {
             JsonArray ja = new JsonArray();
             JsonArray jm = new JsonArray();
@@ -157,6 +171,12 @@ public class TransactionParser<T> {
         }
     }
 
+    /**
+     * Build a new BuilderJavaList
+     * @param type type of transacctionPattern
+     * @param <E> generic type of the builder
+     * @return a new builder
+     */
     public static <E> BuilderJavaList builderJavaList(TransactionPattern type) {
         return new BuilderJavaList<E>(type);
     }
@@ -169,11 +189,16 @@ public class TransactionParser<T> {
             this.type = Objects.requireNonNull(type);
         }
 
+
         public BuilderJavaList<E> setList(List<E> genericList) {
             this.genericList = Objects.requireNonNull(genericList);
             return this;
         }
 
+        /**
+         * Build the TransactionParser
+         * @return TransactionParser with the current states.
+         */
         public TransactionParser<JsonArray> build() {
             JsonArray arrayAsJson = new JsonArray();
             genericList.forEach(arrayAsJson::add);

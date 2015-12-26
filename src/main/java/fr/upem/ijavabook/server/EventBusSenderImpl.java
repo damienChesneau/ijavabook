@@ -13,6 +13,10 @@ import java.util.Objects;
 class EventBusSenderImpl implements EventBusSender {
     private final EventBus eventBus;
 
+    /**
+     * Create an EventBusSender
+     * @param eventBus the eventBus to associate to de EventBusSender.
+     */
     EventBusSenderImpl(EventBus eventBus) {
         this.eventBus = Objects.requireNonNull(eventBus);
     }

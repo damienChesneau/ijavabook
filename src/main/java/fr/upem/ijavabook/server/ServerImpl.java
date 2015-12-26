@@ -32,6 +32,10 @@ class ServerImpl implements Server {
     private final Path rootDirectory;
     private final ExecutorService threadPool = Executors.newFixedThreadPool(20);
 
+    /**
+     * Create a Server
+     * @param rootDirectory the repertory of this server.
+     */
     ServerImpl(Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
         System.setProperty("vertx.disableFileCaching", "true");//DEV
@@ -65,7 +69,7 @@ class ServerImpl implements Server {
                 }));
     }
 
-    public void getAllExerciseHandle(RoutingContext routingContext, ExerciseService exerciseService) {
+    private void getAllExerciseHandle(RoutingContext routingContext, ExerciseService exerciseService) {
         threadPool.execute(() -> {
             List<Path> allByDirectory = exerciseService.getAllByDirectory();
             List<String> filesNames = allByDirectory.stream().map((file) -> {

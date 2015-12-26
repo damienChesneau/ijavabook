@@ -27,6 +27,11 @@ class RouteManager extends AbstractVerticle {
     private final List<Route> routes;
     private final Path rootDirectory;
 
+    /**
+     * Create a RouteManager
+     * @param routes Each routes who will be added in the Verticle
+     * @param rootDirectory The repertory of the server instance
+     */
     RouteManager(List<Route> routes, Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
@@ -41,7 +46,7 @@ class RouteManager extends AbstractVerticle {
         EventBus eb = vertx.eventBus();
         ExerciseService exerciseSrv = Exercises.getExerciseSrv(rootDirectory, new EventBusSenderImpl(eb));
 
-        routes.forEach(routes -> routes.getRequestType().getMethod(router, routes.getRoute()).handler(comingEvent -> {
+        routes.forEach(routes -> routes.getRequestType().getRequestTypeApplication(router, routes.getRoute()).handler(comingEvent -> {
             onlyCurrentComputer(comingEvent.request().getHeader("Host"));
             routes.getEvent().doAction(comingEvent, exerciseSrv);
         })); // route to JSON REST APIs

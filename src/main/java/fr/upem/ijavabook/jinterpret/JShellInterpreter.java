@@ -17,16 +17,24 @@ import java.util.stream.Collectors;
  */
 class JShellInterpreter implements Interpreter {
     private final Path pNominal;
-    private final Path pError;
+    /*private final Path pError;
     private final PrintStream sNominal;
-    private final PrintStream sError;
+    private final PrintStream sError;*/
     private final JShell jShell;
 
-    JShellInterpreter(Path pNominal, Path pError, PrintStream sNominal, PrintStream sError, JShell jShell) {
+    /**
+     * Create a JShelleInterpreter
+     * @param pNominal path of a file witch contains the output of this Interpreter
+     * pError path of a file witch contains the all errors of this Interpreter
+     * sNominal
+     * sError
+     * @param jShell JShell of this Interpreter
+     */
+    JShellInterpreter(Path pNominal, /*Path pError, PrintStream sNominal, PrintStream sError,*/ JShell jShell) {
         this.pNominal = Objects.requireNonNull(pNominal);
-        this.pError = Objects.requireNonNull(pError);
+        /*this.pError = Objects.requireNonNull(pError);
         this.sNominal = Objects.requireNonNull(sNominal);
-        this.sError = Objects.requireNonNull(sError);
+        this.sError = Objects.requireNonNull(sError);*/
         this.jShell = Objects.requireNonNull(jShell);
     }
 
@@ -58,26 +66,26 @@ class JShellInterpreter implements Interpreter {
         }
     }
 
-    @Override
+   /* @Override
     public List<String> getErrors() {
         try {
             return Files.readAllLines(pError);
         } catch (IOException e) {
             throw new Error("Unable to get output of errors. Please close and retry.");
         }
-    }
+    }*/
 
     @Override
     public void close() {
         jShell.close();
-        sError.close();
+        /*sError.close();
         sNominal.close();
         try {
             Files.deleteIfExists(pError);
             Files.deleteIfExists(pNominal);
         } catch (IOException e) {
             throw new Error("Unable to clean temporary output files.");
-        }
+        }*/
     }
 
     @Override
