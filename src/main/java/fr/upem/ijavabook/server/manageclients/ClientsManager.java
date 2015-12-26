@@ -7,6 +7,7 @@ import java.util.HashMap;
 /**
  * Here we manage instances of clients we create new if is asked.
  * And remove from memory when client go.
+ * This class is thread safe.
  *
  * @author Damien Chesneau
  * @author Steeve Sivanantham
