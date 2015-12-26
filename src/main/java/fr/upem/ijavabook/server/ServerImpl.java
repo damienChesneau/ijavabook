@@ -34,6 +34,7 @@ class ServerImpl implements Server {
 
     /**
      * Create a Server
+     *
      * @param rootDirectory the repertory of this server.
      */
     ServerImpl(Path rootDirectory) {
@@ -52,15 +53,15 @@ class ServerImpl implements Server {
         ArrayList<Route> routes = new ArrayList<>();
         routes.add(new Route("/getallexercices/", this::getAllExerciseHandle, RequestType.GET));
         routes.add(new Route("/exercice/", this::getExercise, RequestType.POST));
-        routes.add(new Route("/closeexercice/",this::closeExercise, RequestType.POST));
-        routes.add(new Route("/javacode/",this::getJavaCode, RequestType.POST));
-        routes.add(new Route("/junittest/",this::executeTest,RequestType.POST));
+        routes.add(new Route("/closeexercice/", this::closeExercise, RequestType.POST));
+        routes.add(new Route("/javacode/", this::getJavaCode, RequestType.POST));
+        routes.add(new Route("/junittest/", this::executeTest, RequestType.POST));
         return new RouteManager(routes, rootDirectory);
     }
 
     private void closeExercise(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
-                threadPool.execute(()->{
+                threadPool.execute(() -> {
                     TransactionParser<ArrayList<String>> vals = TransactionParser.parseAsObject(event.toString());
                     Path exerciseOfClient = Paths.get(vals.getMessage().get(1) + ".text");
                     exerciseService.closeExercise(exerciseOfClient);
@@ -84,14 +85,14 @@ class ServerImpl implements Server {
 
     private void getExercise(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
-                threadPool.execute(()-> {
+                threadPool.execute(() -> {
                     Path exerciseOfClient = Paths.get(event.toString() + ".text");
                     int token = clientsManager.newClient(/*exerciseOfClient*/);
                     String exercise = exerciseService.playExercise(exerciseOfClient.normalize());
                     ArrayList<String> response = new ArrayList<>();
                     response.add(new TransactionParser<>(TransactionPattern.RESPONSE_NEW_TOKEN, token).toJson());
                     response.add(new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, exercise).toJson());
-                    routingResponse(routingContext,TransactionParser
+                    routingResponse(routingContext, TransactionParser
                             .builderJavaList(TransactionPattern.RESPONSE_TOKEN_EXERCISE)
                             .setList(response)
                             .build());
@@ -100,11 +101,11 @@ class ServerImpl implements Server {
 
     private void getJavaCode(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
-                threadPool.execute(()->{
+                threadPool.execute(() -> {
                     HashMap<TransactionPattern, String> requestParameters = parseJavaCodeRequest(event.toString());
                     Client clientByToken = getClient(requestParameters);
                     InterpretedLine interpreted = clientByToken.interpret(requestParameters.get(TransactionPattern.REQUEST_JAVA_CODE));
-                    routingResponse(routingContext,TransactionParser
+                    routingResponse(routingContext, TransactionParser
                             .builderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT, clientByToken.getOutput())
                             .setInterpretedLine(interpreted)
                             .build());
@@ -113,15 +114,15 @@ class ServerImpl implements Server {
 
     private void executeTest(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
-                threadPool.execute(()->{
+                threadPool.execute(() -> {
                     HashMap<TransactionPattern, String> requestParameters = parseJavaCodeRequest(event.toString());
                     Client clientByToken = getClient(requestParameters);
                     JunitTestResult result = clientByToken.test(requestParameters.get(TransactionPattern.REQUEST_JUNIT_TEST));
-                    routingResponse(routingContext,new TransactionParser<>(TransactionPattern.RESPONSE_JUNIT_RESULT, result.name()));
+                    routingResponse(routingContext, new TransactionParser<>(TransactionPattern.RESPONSE_JUNIT_RESULT, result.name()));
                 }));
     }
 
-    private void routingResponse(RoutingContext routingContext,TransactionParser transactionParser){
+    private void routingResponse(RoutingContext routingContext, TransactionParser transactionParser) {
         routingContext.response()
                 .putHeader(ContentTypeVal.KEY_VALUE.getContent(), ContentTypeVal.APPLICATION_JSON.getContent())
                 .end(transactionParser.toJson());

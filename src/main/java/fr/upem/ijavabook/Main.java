@@ -17,7 +17,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Path markdownFolder = Paths.get(".").toAbsolutePath();//TO BE UPDATE IN PROD
+        Path markdownFolder = Paths.get(".").toAbsolutePath();
         Server srv = Servers.getServer(markdownFolder);
         String start = srv.start();
         System.out.println("Server started on : " + start);

@@ -16,11 +16,6 @@ import java.util.List;
  */
 public class Client implements Interpreter {
     private final Interpreter interpreter = Interpreters.getJavaInterpreter();
-    //private final Path exercice;
-
-    /*public Client(Path exercise) {
-        this.exercice = Objects.requireNonNull(exercise);
-    }*/
 
     @Override
     public InterpretedLine interpret(String line) {
@@ -37,11 +32,11 @@ public class Client implements Interpreter {
         return interpreter.getOutput();
     }
 
-   /* @Override
-    public List<String> getErrors() {
-        return interpreter.getErrors();
-    }
-*/
+    /* @Override
+     public List<String> getErrors() {
+         return interpreter.getErrors();
+     }
+ */
     @Override
     public void close() {
         interpreter.close();

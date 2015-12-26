@@ -44,6 +44,7 @@ public interface Interpreter extends AutoCloseable {
 
     /**
      * Test a line with the JUnit API
+     *
      * @param line Java code to be tested
      * @return result of the Junit test
      */

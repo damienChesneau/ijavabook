@@ -21,8 +21,9 @@ class Watcher implements Runnable {
 
     /**
      * Create a Watcher.
+     *
      * @param directory repertory to watch
-     * @param onUpdate consumer to execute when a file change.
+     * @param onUpdate  consumer to execute when a file change.
      */
     Watcher(Path directory, Consumer<Path> onUpdate) {
         this(directory, onUpdate, false);

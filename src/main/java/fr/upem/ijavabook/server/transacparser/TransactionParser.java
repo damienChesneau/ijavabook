@@ -102,7 +102,8 @@ public class TransactionParser<T> {
 
     /**
      * Builde a new BuilderJavaInterpreted
-     * @param type type of the transactionPattern
+     *
+     * @param type   type of the transactionPattern
      * @param output everylines of the interpreted output.
      * @return
      */
@@ -150,6 +151,7 @@ public class TransactionParser<T> {
 
         /**
          * Build the TransactionParser
+         *
          * @return TransactionParser with the current states.
          */
         public TransactionParser build() {
@@ -159,7 +161,7 @@ public class TransactionParser<T> {
             ja.add(jm);
             /*if (message == null) {
                 if (il != null) {*/
-                    ja.add(jsonArrayForLine(il));
+            ja.add(jsonArrayForLine(il));
                /* } else {
                     List<JsonArray> str = ils.stream().map((li) -> jsonArrayForLine(li)).collect(Collectors.toList());
                     str.forEach((item) -> ja.add(item));
@@ -173,8 +175,9 @@ public class TransactionParser<T> {
 
     /**
      * Build a new BuilderJavaList
+     *
      * @param type type of transacctionPattern
-     * @param <E> generic type of the builder
+     * @param <E>  generic type of the builder
      * @return a new builder
      */
     public static <E> BuilderJavaList builderJavaList(TransactionPattern type) {
@@ -197,6 +200,7 @@ public class TransactionParser<T> {
 
         /**
          * Build the TransactionParser
+         *
          * @return TransactionParser with the current states.
          */
         public TransactionParser<JsonArray> build() {

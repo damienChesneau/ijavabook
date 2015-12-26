@@ -29,7 +29,8 @@ class RouteManager extends AbstractVerticle {
 
     /**
      * Create a RouteManager
-     * @param routes Each routes who will be added in the Verticle
+     *
+     * @param routes        Each routes who will be added in the Verticle
      * @param rootDirectory The repertory of the server instance
      */
     RouteManager(List<Route> routes, Path rootDirectory) {
@@ -62,7 +63,7 @@ class RouteManager extends AbstractVerticle {
     private BridgeOptions getBridgeOptions(ExerciseService exerciseService) {
         BridgeOptions bridgeOptions = new BridgeOptions();
         List<String> filesNamesWithoutExtension = exerciseService.getFilesNamesWithoutExtension();
-        List<PermittedOptions> po = new ArrayList<>();
+        ArrayList<PermittedOptions> po = new ArrayList<>();
         filesNamesWithoutExtension.forEach(s -> po.add(new PermittedOptions().setAddress(s)));
         bridgeOptions.setOutboundPermitted(po);
         return bridgeOptions;
@@ -73,11 +74,4 @@ class RouteManager extends AbstractVerticle {
             throw new IllegalAccessError("Client are not allow to read this.");
         }
     }
-
-    /*public void sendMessage(String adresse, String message) {
-        Objects.requireNonNull(adresse);
-        Objects.requireNonNull(message);
-        System.out.println(adresse);
-        vertx.eventBus().publish(adresse, message);
-    }*/
 }

@@ -5,7 +5,6 @@ import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,11 +23,12 @@ class JShellInterpreter implements Interpreter {
 
     /**
      * Create a JShelleInterpreter
+     *
      * @param pNominal path of a file witch contains the output of this Interpreter
-     * pError path of a file witch contains the all errors of this Interpreter
-     * sNominal
-     * sError
-     * @param jShell JShell of this Interpreter
+     *                 pError path of a file witch contains the all errors of this Interpreter
+     *                 sNominal
+     *                 sError
+     * @param jShell   JShell of this Interpreter
      */
     JShellInterpreter(Path pNominal, /*Path pError, PrintStream sNominal, PrintStream sError,*/ JShell jShell) {
         this.pNominal = Objects.requireNonNull(pNominal);
@@ -48,12 +48,12 @@ class JShellInterpreter implements Interpreter {
         SnippetEvent eval = jShell.eval(line).get(0);
         Exception e = eval.exception();
         String exception = "";
-        if(eval.status() == Snippet.Status.REJECTED){
+        if (eval.status() == Snippet.Status.REJECTED) {
             exception = "Invalid syntax.";
-        }else if(e != null){
+        } else if (e != null) {
             exception = e.toString();
         }
-        return new InterpretedLine(eval.value(),exception/*,
+        return new InterpretedLine(eval.value(), exception/*,
                 eval.status().name().equals("VALID")*/);
     }
 
@@ -90,8 +90,8 @@ class JShellInterpreter implements Interpreter {
 
     @Override
     public JunitTestResult test(String line) {
-        if(interpret(line).getException().isEmpty()){
-           return JunitTestResult.SUCCESS;
+        if (interpret(line).getException().isEmpty()) {
+            return JunitTestResult.SUCCESS;
         }
         return JunitTestResult.FAIL;
     }

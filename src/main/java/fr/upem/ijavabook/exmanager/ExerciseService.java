@@ -2,7 +2,6 @@ package fr.upem.ijavabook.exmanager;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Observer;
 
 /**
  * Interface who allows all markdown files actions.

@@ -2,6 +2,7 @@ package fr.upem.ijavabook.server;
 
 /**
  * Represents content type values.
+ *
  * @author Damien Chesneau
  */
 enum ContentTypeVal {

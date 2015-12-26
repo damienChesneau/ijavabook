@@ -19,25 +19,30 @@ public class ClientsManager {
     /**
      * Create a new client and return his token.
      * exercise java.nio.file.Path ...
+     *
      * @return int token
      */
-    public int newClient(/*Path exercise*/) {
+    public int newClient() {
         int token = getNewToken();
-        connections.put(token, new Client(/*exercise*/));
+        connections.put(token, new Client());
         return token;
     }
 
     private int getNewToken() {
-        synchronized (lock) {
-            return nextToken++;
+        SecureRandom random = new SecureRandom();
+        int token = random.nextInt();
+        if (connections.containsKey(token)) {
+            return getNewToken();
         }
+        return token;
     }
 
     /**
      * Get a client by his token.
+     *
      * @param token token of the client
-     * @throws IllegalArgumentException if client don't present.
      * @return a Client.
+     * @throws IllegalArgumentException if client don't present.
      */
     public Client getClientByToken(int token) {
         Client client = connections.get(token);
@@ -48,6 +53,7 @@ public class ClientsManager {
     /**
      * Delete client from memory.
      * And close his interpreter instance.
+     *
      * @param token int
      */
     public void rmClient(int token) {

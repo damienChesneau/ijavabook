@@ -1,39 +1,40 @@
 package fr.upem.ijavabook.server;
 
-import io.vertx.ext.web.*;
 import io.vertx.ext.web.Route;
+import io.vertx.ext.web.Router;
 
 import java.util.Objects;
 
 /**
  * enum witch represents a type of request
+ *
  * @author Steeve Sivanantham
  */
 enum RequestType {
     GET {
         @Override
-        Route getRequestTypeApplication(Router router, String path) {
-            idValid(router,path);
+        Route getRoute(Router router, String path) {
             return router.get(path);
         }
     }, POST {
         @Override
-        Route getRequestTypeApplication(Router router, String path) {
-            idValid(router,path);
+        Route getRoute(Router router, String path) {
             return router.post(path);
         }
     };
 
-    private static void idValid(Router router, String path) {
-        Objects.requireNonNull(router);
-        Objects.requireNonNull(path);
-    }
+    abstract Route getRoute(Router router, String path);
 
     /**
-     * returns the application of the corresponding requestType
+     * Returns the application of the corresponding requestType
+     *
      * @param router router witch has the requestType
-     * @param path the route path
-     * @return
+     * @param path   the route path
+     * @return Route
      */
-    abstract Route getRequestTypeApplication(Router router, String path);
+    Route getRequestTypeApplication(Router router, String path) {
+        Objects.requireNonNull(router);
+        Objects.requireNonNull(path);
+        return getRoute(router, path);
+    }
 }

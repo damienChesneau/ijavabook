@@ -23,7 +23,6 @@ class ExerciseImpl implements ExerciseService {
     private final Path rootDirectory;
     private final Object fileMonitor = new Object();
     private final EventBusSender eventBusSender;
-    private final Parser parser = new Parser();
 
     /**
      * Create a new implementation of ExerciseService.
@@ -47,6 +46,7 @@ class ExerciseImpl implements ExerciseService {
         /**
          * Represents file content and numbers of clients reading it.
          * With this constructor only one client number are define to 1.
+         *
          * @param htmlRepresentation java.lang.String representation of html content.
          */
         private EncapsulatePlayingData(String htmlRepresentation) {
@@ -55,8 +55,9 @@ class ExerciseImpl implements ExerciseService {
 
         /**
          * Represents file content and numbers of clients reading it.
+         *
          * @param htmlRepresentation java.lang.String representation of html content.
-         * @param nbClients int define numbers of clients actually reading.
+         * @param nbClients          int define numbers of clients actually reading.
          */
         private EncapsulatePlayingData(String htmlRepresentation, int nbClients) {
             if (nbClients <= 0) {
@@ -68,15 +69,18 @@ class ExerciseImpl implements ExerciseService {
 
         /**
          * Increment the number of clients actually reading.
+         *
          * @return new instance of EncapsulatePlayingData.
          */
         private EncapsulatePlayingData incrementClients() {
             return new EncapsulatePlayingData(htmlRepresentation, nbClients + 1);
         }
+
         /**
          * Decrement the number of clients actually reading.
-         * @throws IllegalStateException if decrementing will pass the count to zero.
+         *
          * @return new instance of EncapsulatePlayingData.
+         * @throws IllegalStateException if decrementing will pass the count to zero.
          */
         private EncapsulatePlayingData decrementClients() {
             if (nbClients == 1) {
@@ -84,8 +88,10 @@ class ExerciseImpl implements ExerciseService {
             }
             return new EncapsulatePlayingData(htmlRepresentation, nbClients - 1);
         }
+
         /**
          * Update the html representation.
+         *
          * @return new instance of EncapsulatePlayingData.
          */
         private EncapsulatePlayingData setHtmlRepresentation(String htmlRepresentation) {
@@ -159,10 +165,12 @@ class ExerciseImpl implements ExerciseService {
     }
 
     private String getHtmlOfAMarkdown(Path file) {
+        Parser parser = new Parser(rootDirectory);
         try {
             String lines;
             synchronized (fileMonitor) {
-                while((lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"))).isEmpty());
+                while ((lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"))).isEmpty())
+                    ;
             }
             return parser.parseMarkdown(lines);
         } catch (IOException e) {

@@ -31,6 +31,7 @@ class Route {
         this.event = Objects.requireNonNull(event);
         this.requestType = Objects.requireNonNull(requestType);
     }
+
     /**
      * Lambda executed when the route are called.
      *
@@ -42,13 +43,14 @@ class Route {
 
     /**
      * Representation of what the client will call.
+     *
      * @return String value.
      */
     public String getRoute() {
         return routePath;
     }
 
-    public RequestType getRequestType(){
+    public RequestType getRequestType() {
         return requestType;
     }
 }

@@ -15,6 +15,7 @@ class EventBusSenderImpl implements EventBusSender {
 
     /**
      * Create an EventBusSender
+     *
      * @param eventBus the eventBus to associate to de EventBusSender.
      */
     EventBusSenderImpl(EventBus eventBus) {

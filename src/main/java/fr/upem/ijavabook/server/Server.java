@@ -2,6 +2,7 @@ package fr.upem.ijavabook.server;
 
 /**
  * Do action in server.
+ *
  * @author Damien Chesneau
  */
 public interface Server {
@@ -13,6 +14,6 @@ public interface Server {
     /**
      * Stop server.
      */
-    void stop() ;
+    void stop();
 
 }

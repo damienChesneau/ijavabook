@@ -20,7 +20,7 @@ public class Exercises {
     /**
      * Hide implementation of exercise service and create a watcher on directory.
      *
-     * @param rootDirectory java.nio.file.Path
+     * @param rootDirectory  java.nio.file.Path
      * @param eventBusSender fr.upem.ijavabook.server.EventBusSender representing a way to update clients exercise in live !
      * @return An implementation to get your exercises.
      */
