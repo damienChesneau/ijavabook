@@ -22,7 +22,6 @@ class ExerciseImpl implements ExerciseService {
 
     private final ConcurrentHashMap<Path, EncapsulatePlayingData> htmlRepresentation = new ConcurrentHashMap<>();
     private final Path rootDirectory;
-    private final Object monitor = new Object();
     private final Object fileMonitor = new Object();
     private final EventBusSender eventBusSender;
     private final Parser parser = new Parser();
@@ -97,39 +96,33 @@ class ExerciseImpl implements ExerciseService {
 
     @Override
     public String playExercise(Path file) {
-        synchronized (monitor) {
-            return htmlRepresentation.compute(file.getFileName(), (path, encapsulatePlayingData) -> {
-                if (encapsulatePlayingData == null) {
-                    return new EncapsulatePlayingData(this.getHtmlOfAMarkdown(path));
-                } else {
-                    return encapsulatePlayingData.incrementClients();
-                }
-            }).htmlRepresentation;
-        }
+        return htmlRepresentation.compute(file.getFileName(), (path, encapsulatePlayingData) -> {
+            if (encapsulatePlayingData == null) {
+                return new EncapsulatePlayingData(this.getHtmlOfAMarkdown(path));
+            } else {
+                return encapsulatePlayingData.incrementClients();
+            }
+        }).htmlRepresentation;
     }
 
     @Override
     public void closeExercise(Path file) {
         file = file.getFileName();
-        synchronized (monitor) {
-            EncapsulatePlayingData encapsulatePlayingData = Objects.requireNonNull(htmlRepresentation.get(file), "The file you want's to close was never open :( ");
-            try {
-                htmlRepresentation.replace(file, encapsulatePlayingData.decrementClients());
-            } catch (IllegalStateException e) {
-                htmlRepresentation.remove(file);
-            }
+        EncapsulatePlayingData encapsulatePlayingData = Objects.requireNonNull(htmlRepresentation.get(file), "The file you want's to close was never open :( ");
+        try {
+            htmlRepresentation.replace(file, encapsulatePlayingData.decrementClients());
+        } catch (IllegalStateException e) {
+            htmlRepresentation.remove(file);
         }
     }
 
     private void updateExercise(Path file) {
-        synchronized (monitor) {
-            htmlRepresentation.computeIfPresent(file.getFileName(), (key, value) -> {
-                String newTranslation = getHtmlOfAMarkdown(file);
-                EncapsulatePlayingData encapsulatePlayingData = value.setHtmlRepresentation(newTranslation);
-                eventBusSender.send(key, newTranslation);
-                return encapsulatePlayingData;
-            });
-        }
+        htmlRepresentation.computeIfPresent(file.getFileName(), (key, value) -> {
+            String newTranslation = getHtmlOfAMarkdown(file);
+            EncapsulatePlayingData encapsulatePlayingData = value.setHtmlRepresentation(newTranslation);
+            eventBusSender.send(key, newTranslation);
+            return encapsulatePlayingData;
+        });
     }
 
     /**

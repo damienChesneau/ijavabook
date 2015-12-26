@@ -3,6 +3,7 @@ package fr.upem.ijavabook.server.manageclients;
 import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Here we manage instances of clients we create new if is asked.
@@ -13,8 +14,9 @@ import java.util.HashMap;
  * @author Steeve Sivanantham
  */
 public class ClientsManager {
-    private final HashMap<Integer, Client> connections = new HashMap<>();
+    private final ConcurrentHashMap<Integer, Client> connections = new ConcurrentHashMap<>();
     private final Object lock = new Object();
+    private int nextToken = new SecureRandom().nextInt();
 
     /**
      * Create a new client and return his token.
@@ -22,20 +24,15 @@ public class ClientsManager {
      * @return int token
      */
     public int newClient(Path exercise) {
-        synchronized (lock) {
-            int token = getNewToken();
-            connections.put(token, new Client(exercise));
-            return token;
-        }
+        int token = getNewToken();
+        connections.put(token, new Client(exercise));
+        return token;
     }
 
     private int getNewToken() {
-        SecureRandom random = new SecureRandom();
-        int token = random.nextInt();
-        if (connections.containsKey(token)) {
-            return getNewToken();
+        synchronized (lock) {
+            return nextToken++;
         }
-        return token;
     }
 
     /**
@@ -45,10 +42,7 @@ public class ClientsManager {
      * @return a Client.
      */
     public Client getClientByToken(int token) {
-        Client client;
-        synchronized (lock) {
-            client = connections.get(token);
-        }
+        Client client = connections.get(token);
         validateClient(client);
         return client;
     }
@@ -59,11 +53,8 @@ public class ClientsManager {
      * @param token int
      */
     public void rmClient(int token) {
-        Client client;
-        synchronized (lock) {
-            client = connections.get(token);
-            connections.remove(token);
-        }
+        Client client = connections.get(token);
+        connections.remove(token);
         validateClient(client);
         client.close();
     }
