@@ -82,22 +82,27 @@ function sendOnClose(message) {
 function placeValueInReq(type, value) {
     return {"t": type, "m": value};
 }
-
-//function sendJavaTest(code,result){
-//    var content = code.text().replace(/\r/g, "\\n");
-//    content = content.replace("\n", "");
-//    var jsonArray = new Array();
-//    jsonArray.push(placeValueInReq("to", token));
-//    jsonArray.push(placeValueInReq("rjt", '{'+content+'}'));
-//    placeValueInReq("rjt", jsonArray);
-//    send("/junittest",jsonArray,function(m){
-//        if(m == 'FAIL'){
-//            result.css('color','red');
-//        }else{
-//            result.css('color','green');
-//        }
-//    });
-//}
+//noinspection JSUnusedGlobalSymbols
+/**
+ * Used for junit test so is ok if is not used.
+ * @param code
+ * @param result
+ */
+function sendJavaTest(code,result){
+    var content = code.text().replace(/\r/g, "\\n");
+    content = content.replace("\n", "");
+    var jsonArray = new Array();
+    jsonArray.push(placeValueInReq("to", token));
+    jsonArray.push(placeValueInReq("rjt", '{'+content+'}'));
+    placeValueInReq("rjt", jsonArray);
+    send("/junittest",jsonArray,function(m){
+        if(m == 'FAIL'){
+            result.css('color','red');
+        }else{
+            result.css('color','green');
+        }
+    });
+}
 
 function sendJavaCode(code) {
     //var content = code.val().replace(/\r\n|\r|\n/g, "\\n");
