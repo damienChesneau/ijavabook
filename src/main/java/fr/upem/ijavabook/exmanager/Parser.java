@@ -7,11 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Parse a markdown string to a html string.
@@ -21,7 +19,7 @@ import java.util.stream.Stream;
  */
 class Parser {
 
-    private int nextId = 0;
+    private int nextTagId = 0;
     private final Object monitor = new Object();
     private final Path rootDirectory;
 
@@ -56,9 +54,9 @@ class Parser {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
     }
 
-    private int getId() {
+    private int getTagId() {
         synchronized (monitor) {
-            return nextId++;
+            return nextTagId++;
         }
     }
 
@@ -107,17 +105,17 @@ class Parser {
     }
 
     private String startTag() {
-        int id = getId();
+        int id = getTagId();
         return "<div class = \"junitTest\"><pre id = \"junitPre" + id + "\"><code id=\"junitTest" + id + "\">";
     }
 
     private String endTag(String startTag) {
-        Optional<String> id = getId(startTag);
+        Optional<String> id = getTagId(startTag);
         return "</code></pre><button type=\"button\"class=\"btn btn-primary\" onclick=\"sendJavaTest(\\$('#junitTest"
                 + (id.isPresent() ? id.get() : "") + "'),\\$('#junitPre" + (id.isPresent() ? id.get() : "") + "'))\">Test</button></div>";
     }
 
-    private Optional<String> getId(String startTag) {
+    private Optional<String> getTagId(String startTag) {
         Matcher matcher = ParserPattern.NB_PATTERN.pattern.matcher(startTag);
         if (matcher.find()) {
             return Optional.of(matcher.group());

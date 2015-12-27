@@ -1,5 +1,6 @@
 package fr.upem.ijavabook.jinterpret;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -27,14 +28,14 @@ public interface Interpreter extends AutoCloseable {
      *
      * @return List of console lines.
      */
-    List<String> getOutput();
+    List<String> getOutput() throws IOException;
 /*
     /**
      * Get output errors of your code inserted.
      *
      * @return List of console lines.
      */
-    /*List<String> getErrors();*/
+    List<String> getErrors() throws IOException;
 
     /**
      * You need doc to this ?

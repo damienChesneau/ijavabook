@@ -3,9 +3,13 @@
  */
 $.ajax({
     method: "GET",
-    url: "/getallexercices",
+    url: "/getallexercices"
 }).done(function (msg) {
-    diplayExercises(msg.m);
+    if(msg.t=="er"){
+        showError(msg.m);
+    }else{
+        diplayExercises(msg.m);
+    }
 });
 
 function diplayExercises(allExoIntab) {

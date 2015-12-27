@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Encapsulate your data to send a formatted response.
@@ -61,9 +62,11 @@ public class TransactionParser<T> {
         String tpAsStr = json.getString(TransactionPattern.TYPE_PATTERN.getTranslation());
         try {
             JsonArray jsonArray = json.getJsonArray(TransactionPattern.MESSAGE_PATTERN.getTranslation());
-            List list = jsonArray.getList();
-            return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), (T) list);
+            @SuppressWarnings("unchecked")
+            T list = (T) jsonArray.getList();
+            return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), list);
         } catch (ClassCastException e) {
+            @SuppressWarnings("unchecked")
             T message = (T) json.getValue(TransactionPattern.MESSAGE_PATTERN.getTranslation());
             return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), message); // TO REFORMAT
         }
@@ -85,14 +88,14 @@ public class TransactionParser<T> {
     public static List<TransactionParser<String>> parseAsArray(String query) {
         Objects.requireNonNull(query);
         JsonArray json = new JsonArray(query);
-        List<LinkedHashMap> list = json.getList();
+        @SuppressWarnings("unchecked")//Yes i say what i do.
+        List<LinkedHashMap<String,String>> list = (List<LinkedHashMap<String, String>>) json.getList();
         ArrayList<TransactionParser<String>> parsed = new ArrayList<>();
-        for (LinkedHashMap lhp : list) {
+        for (LinkedHashMap<String, String> lhp : list) {
             String message = String.valueOf(lhp.get("m"));
             TransactionPattern type = TransactionPattern.getByTranslation(String.valueOf(lhp.get("t")));
             parsed.add(new TransactionParser<>(type, message));
         }
-
         return parsed;
     }
 
@@ -105,16 +108,16 @@ public class TransactionParser<T> {
      *
      * @param type   type of the transactionPattern
      * @param output everylines of the interpreted output.
-     * @return
+     * @return a new instance of BuilderJavaInterpreted.
      */
-    public static BuilderJavaInterpreted builderJavaInterpreted(TransactionPattern type, List<String> output) {
-        return new BuilderJavaInterpreted(type, output.stream().collect(Collectors.joining("</br>")));
+    public static <T> BuilderJavaInterpreted<T> builderJavaInterpreted(TransactionPattern type, List<String> output) {
+        return new BuilderJavaInterpreted<>(type, output.stream().collect(Collectors.joining("</br>")));
     }
 
     /**
      * Builder class for transaction of InterpretedLine
      */
-    public static class BuilderJavaInterpreted {
+    public static class BuilderJavaInterpreted<T> {
         private final TransactionPattern type;
         /*private String message;
         private List<InterpretedLine> ils;*/
@@ -136,7 +139,7 @@ public class TransactionParser<T> {
             return this;
         }*/
 
-        public BuilderJavaInterpreted setInterpretedLine(InterpretedLine il) {
+        public BuilderJavaInterpreted<T> setInterpretedLine(InterpretedLine il) {
             this.il = il;
             return this;
         }
@@ -154,7 +157,7 @@ public class TransactionParser<T> {
          *
          * @return TransactionParser with the current states.
          */
-        public TransactionParser build() {
+        public TransactionParser<JsonArray> build() {
             JsonArray ja = new JsonArray();
             JsonArray jm = new JsonArray();
             jm.add(output);
@@ -177,26 +180,26 @@ public class TransactionParser<T> {
      * Build a new BuilderJavaList
      *
      * @param type type of transacctionPattern
-     * @param <E>  generic type of the builder
      * @return a new builder
      */
-    public static <E> BuilderJavaList builderJavaList(TransactionPattern type) {
-        return new BuilderJavaList<E>(type);
+    public static BuilderJavaList builderJavaList(TransactionPattern type) {
+        return new BuilderJavaList(type);
     }
 
-    public static class BuilderJavaList<E> {
+    public static class BuilderJavaList {
         private final TransactionPattern type;
-        private List<E> genericList;
+        private List<String> genericList;
 
         private BuilderJavaList(TransactionPattern type) {
             this.type = Objects.requireNonNull(type);
         }
 
 
-        public BuilderJavaList<E> setList(List<E> genericList) {
+        public BuilderJavaList setStringList(List<String> genericList) {
             this.genericList = Objects.requireNonNull(genericList);
             return this;
         }
+
 
         /**
          * Build the TransactionParser

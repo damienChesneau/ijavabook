@@ -1,5 +1,6 @@
 package fr.upem.ijavabook.exmanager;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface ExerciseService {
      *
      * @return a list of markdown files.
      */
-    List<Path> getAllByDirectory();
+    List<Path> getAllByDirectory() throws IOException;
 
     /**
      * Returns names of all exercises present in root directory.
@@ -38,5 +39,5 @@ public interface ExerciseService {
      *
      * @return a list of exercises names.
      */
-    List<String> getFilesNamesWithoutExtension();
+    List<String> getFilesNamesWithoutExtension() throws IOException;
 }

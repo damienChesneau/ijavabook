@@ -5,6 +5,7 @@ import fr.upem.ijavabook.jinterpret.Interpreter;
 import fr.upem.ijavabook.jinterpret.Interpreters;
 import fr.upem.ijavabook.jinterpret.JunitTestResult;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,17 +29,17 @@ public class Client implements Interpreter {
     }
 
     @Override
-    public List<String> getOutput() {
+    public List<String> getOutput() throws IOException {
         return interpreter.getOutput();
     }
 
-    /* @Override
-     public List<String> getErrors() {
-         return interpreter.getErrors();
-     }
- */
     @Override
-    public void close() {
+    public List<String> getErrors() throws IOException {
+        return interpreter.getErrors();
+    }
+
+    @Override
+    public void close()  {
         interpreter.close();
     }
 

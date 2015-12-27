@@ -11,7 +11,8 @@ import java.util.Optional;
 public enum TransactionPattern {
     TYPE_PATTERN("t"), MESSAGE_PATTERN("m"), REQUEST_JAVA_CODE("jc"), REQUEST_ASK_EXERCISE("gete"), RESPONSE_EXERCISE("ex"),
     RESPONSE_TOKEN_EXERCISE("tex"), RESPONSE_CODE_OUTPUT("op"), RESPONSE_GET_ALL("rga"), RESPONSE_NEW_TOKEN("nt"),
-    REQUEST_TOKEN("to"), REQUEST_CLOSE_EXERCISE("cex"), RESPONSE_JUNIT_RESULT("rjr"), REQUEST_JUNIT_TEST("rjt");
+    REQUEST_TOKEN("to"), REQUEST_CLOSE_EXERCISE("cex"), RESPONSE_JUNIT_RESULT("rjr"), REQUEST_JUNIT_TEST("rjt"),
+    RESPONSE_ERROR("er");
     private String transalation;//Is a little expression to create little json Objects. This is faster.
 
     TransactionPattern(String transalation) {

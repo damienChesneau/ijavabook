@@ -10,6 +10,7 @@ import fr.upem.ijavabook.server.transacparser.TransactionPattern;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implentation how controls all of server flux.
@@ -72,14 +74,14 @@ class ServerImpl implements Server {
 
     private void getAllExerciseHandle(RoutingContext routingContext, ExerciseService exerciseService) {
         threadPool.execute(() -> {
-            List<Path> allByDirectory = exerciseService.getAllByDirectory();
-            List<String> filesNames = allByDirectory.stream().map((file) -> {
-                String filename = file.getFileName().toString();
-                return filename.substring(0, filename.length() - 5);
-            }).collect(Collectors.toList());
-            routingResponse(routingContext, TransactionParser
-                    .builderJavaList(TransactionPattern.RESPONSE_GET_ALL)
-                    .setList(filesNames).build());
+            try {
+                List<String> filesNames = exerciseService.getFilesNamesWithoutExtension();
+                routingResponse(routingContext, TransactionParser
+                        .builderJavaList(TransactionPattern.RESPONSE_GET_ALL)
+                        .setStringList(filesNames).build());
+            } catch (IOException e) {
+                routingResponseError(routingContext, e.getMessage());
+            }
         });
     }
 
@@ -87,14 +89,14 @@ class ServerImpl implements Server {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
                     Path exerciseOfClient = Paths.get(event.toString() + ".text");
-                    int token = clientsManager.newClient(/*exerciseOfClient*/);
+                    int token = clientsManager.newClient();
                     String exercise = exerciseService.playExercise(exerciseOfClient.normalize());
                     ArrayList<String> response = new ArrayList<>();
                     response.add(new TransactionParser<>(TransactionPattern.RESPONSE_NEW_TOKEN, token).toJson());
                     response.add(new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, exercise).toJson());
                     routingResponse(routingContext, TransactionParser
                             .builderJavaList(TransactionPattern.RESPONSE_TOKEN_EXERCISE)
-                            .setList(response)
+                            .setStringList(response)
                             .build());
                 }));
     }
@@ -105,10 +107,15 @@ class ServerImpl implements Server {
                     HashMap<TransactionPattern, String> requestParameters = parseJavaCodeRequest(event.toString());
                     Client clientByToken = getClient(requestParameters);
                     InterpretedLine interpreted = clientByToken.interpret(requestParameters.get(TransactionPattern.REQUEST_JAVA_CODE));
-                    routingResponse(routingContext, TransactionParser
-                            .builderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT, clientByToken.getOutput())
-                            .setInterpretedLine(interpreted)
-                            .build());
+                    try {
+                        List<String> consoleOutput = clientByToken.getOutput();
+                        routingResponse(routingContext, TransactionParser
+                                .builderJavaInterpreted(TransactionPattern.RESPONSE_CODE_OUTPUT, consoleOutput)
+                                .setInterpretedLine(interpreted)
+                                .build());
+                    } catch (IOException e) {
+                        routingResponseError(routingContext, "Can't get console output.");
+                    }
                 }));
     }
 
@@ -122,10 +129,16 @@ class ServerImpl implements Server {
                 }));
     }
 
-    private void routingResponse(RoutingContext routingContext, TransactionParser transactionParser) {
+    private void routingResponse(RoutingContext routingContext, TransactionParser<?> transactionParser) {
         routingContext.response()
                 .putHeader(ContentTypeVal.KEY_VALUE.getContent(), ContentTypeVal.APPLICATION_JSON.getContent())
                 .end(transactionParser.toJson());
+    }
+
+    private void routingResponseError(RoutingContext routingContext, String errorMessage) {
+        routingContext.response()
+                .putHeader(ContentTypeVal.KEY_VALUE.getContent(), ContentTypeVal.APPLICATION_JSON.getContent())
+                .end((new TransactionParser<>(TransactionPattern.RESPONSE_ERROR, errorMessage)).toJson());
     }
 
     private Client getClient(HashMap<TransactionPattern, String> requestParameters) {

@@ -11,6 +11,7 @@ import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,7 @@ class RouteManager extends AbstractVerticle {
      * Vertx is a super instance.
      */
     @Override
-    public void start() {
+    public void start() throws IOException {
         Router router = Router.router(vertx);
         EventBus eb = vertx.eventBus();
         ExerciseService exerciseSrv = Exercises.getExerciseSrv(rootDirectory, new EventBusSenderImpl(eb));
@@ -60,7 +61,7 @@ class RouteManager extends AbstractVerticle {
         httpServer.listen(Servers.SERVER_PORT);
     }
 
-    private BridgeOptions getBridgeOptions(ExerciseService exerciseService) {
+    private BridgeOptions getBridgeOptions(ExerciseService exerciseService) throws IOException {
         BridgeOptions bridgeOptions = new BridgeOptions();
         List<String> filesNamesWithoutExtension = exerciseService.getFilesNamesWithoutExtension();
         ArrayList<PermittedOptions> po = new ArrayList<>();

@@ -45,11 +45,6 @@ class Watcher implements Runnable {
         return watcher.take();
     }
 
-    /*public void setOnUpdate(Consumer<Path> runUpdate) {
-        Objects.requireNonNull(runUpdate);
-        calls.put(ENTRY_MODIFY.name(), runUpdate);
-    }*/
-
     private void launch() throws IOException, InterruptedException {
         while (!Thread.interrupted()) {
             initializer().pollEvents().forEach(event -> {
@@ -72,7 +67,7 @@ class Watcher implements Runnable {
         };
     }
 
-    private void callUserLambda(WatchEvent event) {
+    private void callUserLambda(WatchEvent<?> event) {
         Consumer<Path> consumer = calls.getOrDefault(event.kind().toString(), (cs) -> {
         });
         Path resolve = directory.resolve((event.context().toString())).normalize();
@@ -87,8 +82,6 @@ class Watcher implements Runnable {
             this.launch();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            return;
-        }
+        } catch (InterruptedException e) {/* We do nothing.*/ }
     }
 }

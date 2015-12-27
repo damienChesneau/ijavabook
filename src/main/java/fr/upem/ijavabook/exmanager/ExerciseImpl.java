@@ -103,7 +103,11 @@ class ExerciseImpl implements ExerciseService {
     public String playExercise(Path file) {
         return htmlRepresentation.compute(file.getFileName(), (path, encapsulatePlayingData) -> {
             if (encapsulatePlayingData == null) {
-                return new EncapsulatePlayingData(this.getHtmlOfAMarkdown(path));
+                try {
+                    return new EncapsulatePlayingData(this.getHtmlOfAMarkdown(path));
+                } catch (IOException e) {
+                    throw new AssertionError("Can't get html content.", e);
+                }
             } else {
                 return encapsulatePlayingData.incrementClients();
             }
@@ -123,10 +127,14 @@ class ExerciseImpl implements ExerciseService {
 
     private void updateExercise(Path file) {
         htmlRepresentation.computeIfPresent(file.getFileName(), (key, value) -> {
-            String newTranslation = getHtmlOfAMarkdown(file);
-            EncapsulatePlayingData encapsulatePlayingData = value.setHtmlRepresentation(newTranslation);
-            eventBusSender.send(key, newTranslation);
-            return encapsulatePlayingData;
+            try {
+                String newTranslation = getHtmlOfAMarkdown(file);
+                EncapsulatePlayingData encapsulatePlayingData = value.setHtmlRepresentation(newTranslation);
+                eventBusSender.send(key, newTranslation);
+                return encapsulatePlayingData;
+            } catch (IOException e) {
+                throw new IllegalStateException("Can't update with new html content", e);
+            }
         });
     }
 
@@ -139,13 +147,8 @@ class ExerciseImpl implements ExerciseService {
     }
 
     @Override
-    public List<Path> getAllByDirectory() {
-        try {
-            return Files.list(rootDirectory).filter(this::filterMarkdownFile).collect(Collectors.toList());
-        } catch (IOException e) {
-            Logger.getLogger(ExerciseImpl.class.getName()).log(Level.SEVERE, "Can't get all paths.");
-            throw new AssertionError();
-        }
+    public List<Path> getAllByDirectory() throws IOException {
+        return Files.list(rootDirectory).filter(this::filterMarkdownFile).collect(Collectors.toList());
     }
 
     private boolean filterMarkdownFile(Path path) {
@@ -154,7 +157,7 @@ class ExerciseImpl implements ExerciseService {
     }
 
     @Override
-    public List<String> getFilesNamesWithoutExtension() {
+    public List<String> getFilesNamesWithoutExtension() throws IOException {
         int sizeOfExtension = 5;
         List<Path> allByDirectory = this.getAllByDirectory();
         return allByDirectory.stream()
@@ -164,18 +167,13 @@ class ExerciseImpl implements ExerciseService {
                 .collect(Collectors.<String>toList());
     }
 
-    private String getHtmlOfAMarkdown(Path file) {
+    private String getHtmlOfAMarkdown(Path file) throws IOException {
         Parser parser = new Parser(rootDirectory);
-        try {
-            String lines;
-            synchronized (fileMonitor) {
-                while ((lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"))).isEmpty())
-                    ;
-            }
-            return parser.parseMarkdown(lines);
-        } catch (IOException e) {
-            throw new AssertionError(e);
+        String lines;
+        synchronized (fileMonitor) {
+            lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"));
         }
+        return parser.parseMarkdown(lines);
     }
 
 }
