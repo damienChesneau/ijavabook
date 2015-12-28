@@ -4,6 +4,7 @@ import jdk.jshell.JShell;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -28,8 +29,8 @@ public class Interpreters {
         try {
             Path tmpFile = Files.createTempFile("tmp", ".jshell");
             Path tmpErrFile = Files.createTempFile("tmp", ".err.jshell");
-            PrintStream sNominal = new PrintStream(Files.newOutputStream(tmpFile));
-            PrintStream sError = new PrintStream(Files.newOutputStream(tmpErrFile));
+            PrintStream sNominal = new PrintStream(Files.newOutputStream(tmpFile), true, "UTF-8");
+            PrintStream sError = new PrintStream(Files.newOutputStream(tmpErrFile), true, "UTF-8");
             JShell jshell = JShell.builder().out(sNominal).err(sError).build();
             JShellInterpreter jShellInterpreter = new JShellInterpreter(tmpFile, tmpErrFile, sNominal, sError, jshell);
             jShellInterpreter.interpret("import org.junit.*;");
