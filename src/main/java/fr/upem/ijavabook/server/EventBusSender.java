@@ -27,8 +27,11 @@ public class EventBusSender {
     public void send(Path file, String htmlContent) {
         Objects.requireNonNull(file);
         Objects.requireNonNull(htmlContent);
-        String filename = file.getFileName().toString();
-        filename = filename.substring(0, filename.length() - 5);
-        eventBus.send(filename, new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, htmlContent).toJson());
+        Path pathFileName;
+        if ((pathFileName = file.getFileName()) == null) {
+            String filename = file.toString();
+            filename = filename.substring(0, filename.length() - 5);
+            eventBus.send(filename, new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, htmlContent).toJson());
+        }
     }
 }

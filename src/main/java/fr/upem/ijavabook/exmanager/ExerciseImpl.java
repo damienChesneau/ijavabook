@@ -114,12 +114,15 @@ class ExerciseImpl implements ExerciseService {
 
     @Override
     public void closeExercise(Path file) {
-        file = file.getFileName();
-        EncapsulatePlayingData encapsulatePlayingData = Objects.requireNonNull(htmlRepresentation.get(file), "The file you want's to close was never open :( ");
-        try {
-            htmlRepresentation.replace(file, encapsulatePlayingData.decrementClients());
-        } catch (IllegalStateException e) {
-            htmlRepresentation.remove(file);
+        if ((file = file.getFileName()) != null) {
+            EncapsulatePlayingData encapsulatePlayingData = Objects.requireNonNull(htmlRepresentation.get(file), "The file you want's to close was never open :( ");
+            try {
+                htmlRepresentation.replace(file, Objects.requireNonNull(encapsulatePlayingData.decrementClients()));
+            } catch (IllegalStateException e) {
+                htmlRepresentation.remove(file);
+            }
+        }else {
+            throw new IllegalArgumentException("Argument passed is not a directory.");
         }
     }
 
@@ -151,7 +154,10 @@ class ExerciseImpl implements ExerciseService {
 
     private boolean filterMarkdownFile(Path path) {
         String markdownExtension = ".text";
-        return path.getFileName().toString().contains(markdownExtension);
+        if ((path = path.getFileName()) != null) {
+            return path.toString().contains(markdownExtension);
+        }
+        return true;
     }
 
     @Override
