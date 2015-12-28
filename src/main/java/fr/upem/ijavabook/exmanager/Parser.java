@@ -65,7 +65,7 @@ class Parser {
         while (startMatch.find()) {
             String startT = startTag();
             html = startMatch.replaceFirst(startT);
-            processEndTag(html, startT);
+            html = processEndTag(html, startT);
             startMatch = ParserPattern.OPEN_JUNIT_PATTERN.pattern.matcher(html);
         }
         return html;
@@ -84,7 +84,7 @@ class Parser {
         while (tag.find()) {
             Optional<String> test = getSrc(tag.group());
             String startT = startTag();
-            html = tag.replaceFirst(startT + (test.isPresent() ? test.get() : "") + endTag(startT));
+            html = tag.replaceFirst(startT + (test.isPresent() ? test.get() : "File not specified.") + endTag(startT));
             tag = ParserPattern.FILE_JUNIT_PATTERN.pattern.matcher(html);
         }
         return html;
@@ -110,17 +110,17 @@ class Parser {
     }
 
     private String endTag(String startTag) {
-        Optional<String> id = getTagId(startTag);
+        String id = getTagId(startTag);
         return "</code></pre><button type=\"button\"class=\"btn btn-primary\" onclick=\"sendJavaTest(\\$('#junitTest"
-                + (id.isPresent() ? id.get() : "") + "'),\\$('#junitPre" + (id.isPresent() ? id.get() : "") + "'))\">Test</button></div>";
+                + id + "'),\\$('#junitPre" + id + "'))\">Test</button></div>";
     }
 
-    private Optional<String> getTagId(String startTag) {
+    private String   getTagId(String startTag) {
         Matcher matcher = ParserPattern.NB_PATTERN.pattern.matcher(startTag);
         if (matcher.find()) {
-            return Optional.of(matcher.group());
+            return matcher.group();
         }
-        return Optional.empty();
+        throw new AssertionError();
     }
 
 

@@ -108,7 +108,8 @@ function sendJavaTest(code,result){
     jsonArray.push(placeValueInReq("rjt", '{'+content+'}'));
     placeValueInReq("rjt", jsonArray);
     send("/junittest",jsonArray,function(m){
-        if(m == 'FAIL'){
+        console.log(m.m);
+        if(m.m == 'FAIL'){
             result.css('color','red');
         }else{
             result.css('color','green');
