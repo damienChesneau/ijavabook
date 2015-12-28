@@ -1,0 +1,58 @@
+@startuml
+package fr.upem.ijavabook{
+    Interface Runnable{
+        +run()
+    }
+    package exmanager{
+        interface ExerciseService
+
+        class EncapsulatePlayingData
+        enum PatternParser
+
+        class ExerciseImpl implements ExerciseService{
+            ~ ExerciseImpl(Path,EventBusSender)
+            ~ startWatcher()
+        }
+        class Exercises{
+            {static} + getExerciseSrv(Path,EventbusSender) : ExerciseService
+        }
+        class Parser{
+            ~ Parser(Path)
+            + parseMarkdown(String):String
+        }
+        class Watcher implements Runnable{
+            ~Watcher(Path)
+        }
+        ExerciseImpl-->"*"EncapsulatelayingData
+        Parser ..->PatternParser
+    }
+
+    package jinterpret{
+        class InterpretedLine
+        interface Interpreter
+        class JShelleInterpreter implements Interpreter
+        enum JunitTestResult
+    }
+
+    package server{
+        class EventBusSender
+        enum ContentTypeVal
+        enum RequestType
+        class Route
+        class RouteManager
+        interface Server
+        class ServerImpl implements Server
+        class Servers
+        package manageclients{
+            class Client
+            class ClientsManager
+        }
+        package transacparser{
+            class TransactionParser
+            enum TransactionPattern
+        }
+        ExerciseImpl<--EventBusSender
+    }
+}
+
+@enduml
