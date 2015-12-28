@@ -52,7 +52,7 @@ class RouteManager extends AbstractVerticle {
         BridgeOptions opts = getBridgeOptions(exerciseSrv);
         SockJSHandler ebHandler = SockJSHandler.create(vertx).bridge(opts);
         router.route("/eventbus/*").handler(ebHandler);
-        router.route().handler(StaticHandler.create());// otherwise serve static pages
+        router.route().handler(StaticHandler.create("webroot"));// otherwise serve static pages
         HttpServer httpServer = vertx.createHttpServer();
         httpServer.requestHandler(router::accept);
         httpServer.listen(Servers.SERVER_PORT);
