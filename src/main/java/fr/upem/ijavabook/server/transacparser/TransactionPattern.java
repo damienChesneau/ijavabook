@@ -5,7 +5,7 @@ import java.util.Optional;
 
 /**
  * Define formatted names to send in request/ responses.
- *
+ * This way allow to have short types files are finest.
  * @author Damien Chesneau
  */
 public enum TransactionPattern {

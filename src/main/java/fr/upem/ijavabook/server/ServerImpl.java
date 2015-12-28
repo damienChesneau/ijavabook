@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Implentation how controls all of server flux.
+ * Implementation how controls all of server flux.
  *
  * @author Damien Chesneau
  */
@@ -32,11 +32,10 @@ class ServerImpl implements Server {
     private final Vertx webSrv = Vertx.vertx();
     private final ClientsManager clientsManager = new ClientsManager();
     private final Path rootDirectory;
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(20);
+    private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /**
-     * Create a Server
-     *
+     * Create a new Server instance.
      * @param rootDirectory the repertory of this server.
      */
     ServerImpl(Path rootDirectory) {
@@ -51,6 +50,10 @@ class ServerImpl implements Server {
         return "http://localhost:" + Servers.SERVER_PORT + "/";
     }
 
+    /**
+     * This method initialize all routes with her action.
+     * @return routeManager
+     */
     private RouteManager initRouteManage() {
         ArrayList<Route> routes = new ArrayList<>();
         routes.add(new Route("/getallexercices/", this::getAllExerciseHandle, RequestType.GET));
@@ -61,6 +64,12 @@ class ServerImpl implements Server {
         return new RouteManager(routes, rootDirectory);
     }
 
+    /**
+     * This method are called when a client close his browser window.
+     * So she manage the closing of opened instance like exercises and interpreter.
+     * @param routingContext
+     * @param exerciseService
+     */
     private void closeExercise(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
@@ -72,6 +81,11 @@ class ServerImpl implements Server {
                 }));
     }
 
+    /**
+     * Method called for first page. She respond with a list of exercises present.
+     * @param routingContext
+     * @param exerciseService
+     */
     private void getAllExerciseHandle(RoutingContext routingContext, ExerciseService exerciseService) {
         threadPool.execute(() -> {
             try {
@@ -85,6 +99,12 @@ class ServerImpl implements Server {
         });
     }
 
+    /**
+     * Method called when a new worker want to do an exercise.
+     * This returns a token for identify client and the html of the client.
+     * @param routingContext
+     * @param exerciseService
+     */
     private void getExercise(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
@@ -101,6 +121,12 @@ class ServerImpl implements Server {
                 }));
     }
 
+    /**
+     * This method are called when a client want's to interpret a Java code.
+     * This returns expression value and console output.
+     * @param routingContext
+     * @param exerciseService
+     */
     private void getJavaCode(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
@@ -119,6 +145,11 @@ class ServerImpl implements Server {
                 }));
     }
 
+    /**
+     * This method are used for test client java code.
+     * @param routingContext
+     * @param exerciseService
+     */
     private void executeTest(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
