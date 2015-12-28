@@ -29,7 +29,7 @@ public interface Interpreter extends AutoCloseable {
      * @return List of console lines.
      */
     List<String> getOutput() throws IOException;
-/*
+
     /**
      * Get output errors of your code inserted.
      *

@@ -11,8 +11,16 @@ import java.util.Objects;
  * @author Damien Chesneau
  */
 class Route {
+    /**
+     * This represent a method how are called when the request come to the server.
+     */
     @FunctionalInterface
     interface EventWithExercise {
+        /**
+         * Method called when client send request.
+         * @param routingContext instance of routing context.
+         * @param exerciseService instance of exercises service.
+         */
         void doAction(RoutingContext routingContext, ExerciseService exerciseService);
     }
 
@@ -23,8 +31,9 @@ class Route {
     /**
      * Create a new HTTP route.
      *
-     * @param routePath is the path after server declaration, clients use this to use service.
-     * @param event     is the lambda executed when client call routePath.
+     * @param routePath   is the path after server declaration, clients use this to use service.
+     * @param event       is the lambda executed when client call routePath.
+     * @param requestType if it is a post or an get method.
      */
     Route(String routePath, EventWithExercise event, RequestType requestType) {
         this.routePath = Objects.requireNonNull(routePath);
@@ -44,12 +53,16 @@ class Route {
     /**
      * Representation of what the client will call.
      *
-     * @return String value.
+     * @return route name.
      */
     public String getRoute() {
         return routePath;
     }
 
+    /**
+     * Return the type of the route.
+     * @return post or get.
+     */
     public RequestType getRequestType() {
         return requestType;
     }

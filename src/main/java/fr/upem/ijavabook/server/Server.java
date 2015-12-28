@@ -1,7 +1,7 @@
 package fr.upem.ijavabook.server;
 
 /**
- * Do action in server.
+ * Do simple action in server.
  *
  * @author Damien Chesneau
  */
