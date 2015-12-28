@@ -160,6 +160,18 @@ function splitJavaCode(allContent) {
                 i = passBloc(allContent, i,'(',')');
                 break;
 
+            case '[':
+                i = passBloc(allContent, i,'([',']');
+                break;
+
+            case '"':
+                i = passBloc(allContent, i,'"','"');
+                break;
+
+            case '\'':
+                i = passBloc(allContent, i,'\'','\'');
+                break;
+
         }
     }
     addRequest(allContent,start,allContent.length);
