@@ -24,6 +24,7 @@ class JShellInterpreter implements Interpreter {
     private final PrintStream sNominal;
     private final PrintStream sError;
     private final JShell jShell;
+    private final Object monitor = new Object();
 
     /**
      * Create a JShellInterpreter
@@ -49,26 +50,43 @@ class JShellInterpreter implements Interpreter {
 
     @Override
     public InterpretedLine interpret(String line) {
-        SnippetEvent eval = jShell.eval(line).get(0);
+        SnippetEvent eval;
+        synchronized (monitor) {
+            eval = jShell.eval(line).get(0);
+        }
         Exception e = eval.exception();
         String exception = "";
         if (eval.status() == Snippet.Status.REJECTED) {
             exception = "Invalid syntax.";
         } else if (e != null) {
-            exception = e.toString();
+            exception = getAllStackTrace(e);
         }
         return new InterpretedLine(eval.value(), exception/*,
                 eval.status().name().equals("VALID")*/);
     }
 
+    private String getAllStackTrace(Exception e) {
+        StringBuilder stackTraceBuilder = new StringBuilder();
+        stackTraceBuilder.append(e.toString()).append("\n");
+        StackTraceElement[] stackTraceElements = e.getStackTrace();
+        for (int i = 0; i<stackTraceElements.length-2;i++) {
+            stackTraceBuilder.append(stackTraceElements[i].toString()).append("\n");
+        }
+        return stackTraceBuilder.toString();
+    }
+
     @Override
     public List<String> getOutput() throws IOException {
-        return Files.readAllLines(pNominal);
+        synchronized (monitor) {
+            return Files.readAllLines(pNominal);
+        }
     }
 
     @Override
     public List<String> getErrors() throws IOException {
-        return Files.readAllLines(pError);
+        synchronized (monitor) {
+            return Files.readAllLines(pError);
+        }
     }
 
     @Override
@@ -78,20 +96,25 @@ class JShellInterpreter implements Interpreter {
         } catch (IOException e) {
             throw new RuntimeException("Can't close interpreter :(.");
         }
-
     }
 
     private void closeAndDestructFiles() throws IOException {
-        jShell.close();
-        sError.close();
-        sNominal.close();
-        Files.deleteIfExists(pError);
-        Files.deleteIfExists(pNominal);
+        synchronized (monitor) {
+            jShell.close();
+            sError.close();
+            sNominal.close();
+            Files.deleteIfExists(pError);
+            Files.deleteIfExists(pNominal);
+        }
     }
 
     @Override
     public JunitTestResult test(String line) {
-        if (interpret(line).getException().isEmpty()) {
+        boolean result;
+        synchronized (monitor) {
+            result = interpret(line).getException().isEmpty();
+        }
+        if (result) {
             return JunitTestResult.SUCCESS;
         }
         return JunitTestResult.FAIL;
