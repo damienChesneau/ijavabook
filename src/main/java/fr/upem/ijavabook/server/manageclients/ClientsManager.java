@@ -14,8 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientsManager {
     private final ConcurrentHashMap<Integer, Client> connections = new ConcurrentHashMap<>();
-    private final Object lock = new Object();
-    private int nextToken = new SecureRandom().nextInt();
+    private final SecureRandom random = new SecureRandom();
 
     /**
      * Create a new client and return his token.
@@ -30,7 +29,6 @@ public class ClientsManager {
     }
 
     private int getNewToken() {
-        SecureRandom random = new SecureRandom();
         int token = random.nextInt();
         if (connections.containsKey(token)) {
             return getNewToken();

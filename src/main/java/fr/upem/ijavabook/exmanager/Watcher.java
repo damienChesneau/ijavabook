@@ -76,6 +76,9 @@ class Watcher implements Runnable {
         }
     }
 
+    /**
+     * Launch the thread watcher.
+     */
     @Override
     public void run() {
         try {

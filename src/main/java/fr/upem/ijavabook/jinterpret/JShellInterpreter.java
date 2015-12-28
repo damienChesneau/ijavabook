@@ -13,6 +13,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
+ * Implementation class for interpret a java code.
+ * This class are immutable.
+ *
  * @author Damien Chesneau
  */
 class JShellInterpreter implements Interpreter {
@@ -26,9 +29,9 @@ class JShellInterpreter implements Interpreter {
      * Create a JShellInterpreter
      *
      * @param pNominal path of a file witch contains the output of this Interpreter
-     *                 pError path of a file witch contains the all errors of this Interpreter
-     *                 sNominal
-     *                 sError
+     * @param pError   path of a file witch contains the all errors of this Interpreter
+     * @param sNominal Stream of standard console.
+     * @param sError   Stream of error console.
      * @param jShell   JShell of this Interpreter
      */
     JShellInterpreter(Path pNominal, Path pError, PrintStream sNominal, PrintStream sError, JShell jShell) {

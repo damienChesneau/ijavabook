@@ -31,22 +31,19 @@ class RouteManager extends AbstractVerticle {
     /**
      * Create a RouteManager
      *
-     * @param routes        Each routes who will be added in the Verticle
-     * @param rootDirectory The repertory of the server instance
+     * @param routes        Each routes who will be added in the server.
+     * @param rootDirectory The repertory of the server instance.
      */
     RouteManager(List<Route> routes, Path rootDirectory) {
         this.rootDirectory = Objects.requireNonNull(rootDirectory);
         this.routes = Collections.unmodifiableList(Objects.requireNonNull(routes));
     }
 
-    /**
-     * Vertx is a super instance.
-     */
     @Override
     public void start() throws IOException {
         Router router = Router.router(vertx);
         EventBus eb = vertx.eventBus();
-        ExerciseService exerciseSrv = Exercises.getExerciseSrv(rootDirectory, new EventBusSenderImpl(eb));
+        ExerciseService exerciseSrv = Exercises.getExerciseSrv(rootDirectory, new EventBusSender(eb));
 
         routes.forEach(routes -> routes.getRequestType().getRequestTypeApplication(router, routes.getRoute()).handler(comingEvent -> {
             onlyCurrentComputer(comingEvent.request().getHeader("Host"));
@@ -70,6 +67,10 @@ class RouteManager extends AbstractVerticle {
         return bridgeOptions;
     }
 
+    /**
+     * Method used for security. We allow just owner of the computer.
+     * @param host String name of the computer.
+     */
     private void onlyCurrentComputer(String host) {
         if (!("localhost:" + Servers.SERVER_PORT).equals(host)) {
             throw new IllegalAccessError("Client are not allow to read this.");

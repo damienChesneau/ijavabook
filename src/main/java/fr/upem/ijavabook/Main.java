@@ -16,6 +16,10 @@ public class Main {
     private Main() {
     }
 
+    /**
+     * Input of program. No parameters needed.
+     * @param args
+     */
     public static void main(String[] args) {
         Path markdownFolder = Paths.get(".").toAbsolutePath();
         Server srv = Servers.getServer(markdownFolder);
