@@ -39,6 +39,12 @@ function showHide() {
     }
 }
 
+function testAll(parent){
+    parent.each(function(index, element){
+        sendJavaTest(element.find("code"),element.find("pre"));
+    });
+}
+
 function displayExercise(message) {
     for (var i = 0; i < message.length; i++) {
         actionOnResponse(JSON.parse(message[i]));
@@ -159,10 +165,10 @@ function splitJavaCode(allContent) {
 }
 
 function sendAllLines(allCode){
-    var allContent = allCode.val();
-    allCode.val('');
     if(canISend) {
         canISend = false;
+        var allContent = allCode.val();
+        allCode.val('');
         splitJavaCode(allContent);
         sendJavaCode(requests[nbReq++]);
     }
