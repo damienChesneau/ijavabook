@@ -1,79 +1,40 @@
 <project name="ijavabook" default="all">
-    <target name="all" depends="clean, compile, jar, docs"/>
+    <target name="all" depends="clean, compile, jar, javadoc"/>
 
     <target name="clean">
         <delete dir="target" quiet="true"/>
     </target>
 
+    <path id="compile.classpath">
+        <fileset dir="lib" includes="*.jar"/>
+        <fileset dir="vertx/lib" includes="*.jar"/>
+    </path>
+
     <target name="compile">
         <mkdir dir="target/classes"/>
         <javac srcdir="src/main" destdir="target/classes">
-            <classpath>
-                <pathelement location="lib/asm-all-5.0.4.jar.jar"/>
-                <pathelement location="lib/jdk.jshell.jar"/>
-                <pathelement location="lib/parboiled-core-1.1.7.jar"/>
-                <pathelement location="lib/parboiled-java-1.1.7.jar"/>
-                <pathelement location="lib/pegdown-1.6.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/jackson-annotations-2.5.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/jackson-core-2.5.3.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/jackson-databind-2.5.3.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/netty-buffer-4.0.28.Final.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/netty-codec-4.0.28.Final.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/netty-codec-http-4.0.28.Final.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/netty-common-4.0.28.Final.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/netty-handler-4.0.28.Final.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/netty-transport-4.0.28.Final.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/vertx-auth-common-3.0.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/vertx-core-3.0.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/vertx-mail-client-3.0.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/vertx-mail-service-3.0.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/vertx-unit-3.0.0.jar"/>
-                <pathelement location="lib/vert.x-3.0.0/lib/vertx-web-3.0.0.jar"/>
-            </classpath>
+            <classpath refid="compile.classpath"/>
         </javac>
     </target>
-
-    <!--<target name="sleep">-->
-    <!--<echo message="Sleeping for a while so you can see the build in the new dashboard" />-->
-    <!--<sleep seconds="2" />-->
-    <!--</target>-->
-
-    <!--<target name="test" depends="compile">-->
-    <!--<mkdir dir="target/test-classes"/>-->
-    <!--<javac srcdir="test" destdir="target/test-classes">-->
-    <!--<classpath>-->
-    <!--<pathelement location="target/classes"/>-->
-    <!--<pathelement location="lib/junit.jar"/>-->
-    <!--</classpath>-->
-    <!--</javac>-->
-
-    <!--<mkdir dir="target/test-results"/>-->
-    <!--<junit haltonfailure="no" printsummary="on">-->
-    <!--<classpath>-->
-    <!--<pathelement location="target/classes"/>-->
-    <!--<pathelement location="lib/junit.jar"/>-->
-    <!--<pathelement location="target/test-classes"/>-->
-    <!--</classpath>-->
-    <!--<formatter type="brief" usefile="false"/>-->
-    <!--<formatter type="xml"/>-->
-    <!--<batchtest todir="target/test-results">-->
-    <!--<fileset dir="target/test-classes" includes="**/*Test.class"/>-->
-    <!--</batchtest>-->
-    <!--</junit>-->
-    <!--</target>-->
-
-    <target name="jar" depends="compile">
-        <jar jarfile="target/connectfour.jar" basedir="target/classes"/>
+    <target name="jar">
+        <mkdir dir="target"/>
+        <manifestclasspath property="jar.classpath" jarfile="target/jshellbook.jar">
+            <classpath refid="compile.classpath"/>
+        </manifestclasspath>
+        <jar destfile="target/jshellbook.jar" basedir="target/classes">
+            <manifest>
+                <attribute name="Main-Class" value="fr.upem.ijavabook.Main"/>
+                <attribute name="Class-Path" value="${jar.classpath}"/>
+            </manifest>
+        </jar>
     </target>
 
-    <!-- Creates Javadoc -->
-    <target name="docs" depends="compile">
+    <target name="javadoc" depends="compile">
         <javadoc packagenames="src" sourcepath="src" destdir="docs/api">
-            <!-- Define which files / directory should get included, we include all -->
-            <fileset dir="src">
+            <classpath refid="compile.classpath"/>
+            <fileset dir="src/main">
                 <include name="**"/>
             </fileset>
         </javadoc>
     </target>
-
 </project>
