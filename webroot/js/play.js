@@ -7,7 +7,7 @@ var token;
 var showHideBool = true;
 var eventBus = new vertx.EventBus("/eventbus/");
 
-var canISend = true;
+var canISend = false;
 var requests = [];
 var nbReq = 0;
 
@@ -28,6 +28,7 @@ $.ajax({
         return;
     }
     displayExercise(msg.m);
+    canISend = true;
 });
 
 function showHide() {
