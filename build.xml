@@ -13,6 +13,7 @@
     <target name="compile">
         <mkdir dir="target/classes"/>
         <javac srcdir="src/main" destdir="target/classes">
+            <compilerarg value="-Xlint:all"/>
             <classpath refid="compile.classpath"/>
         </javac>
     </target>
@@ -32,7 +33,7 @@
     <target name="javadoc" depends="compile">
         <javadoc packagenames="src" sourcepath="src" destdir="docs/api">
             <classpath refid="compile.classpath"/>
-            <fileset dir="src/main">
+            <fileset dir="src/main/java">
                 <include name="**"/>
             </fileset>
         </javadoc>
