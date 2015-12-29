@@ -18,7 +18,7 @@ public class Main {
 
     /**
      * Input of program. No parameters needed.
-     * @param args
+     * @param args not used
      */
     public static void main(String[] args) {
         Path markdownFolder = Paths.get(".").toAbsolutePath();

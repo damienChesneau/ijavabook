@@ -8,6 +8,7 @@ package fr.upem.ijavabook.server;
 public interface Server {
     /**
      * Start server.
+     * @return URL to access to server.
      */
     String start();
 

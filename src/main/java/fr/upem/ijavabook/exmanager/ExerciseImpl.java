@@ -142,7 +142,7 @@ class ExerciseImpl implements ExerciseService {
     /**
      * Start the watcher on the folder passed in constructor.
      */
-    public void startWatcher() {
+    void startWatcher() {
         Thread threadWatcherOnRepository = new Thread(new Watcher(rootDirectory, this::updateExercise));
         threadWatcherOnRepository.start();
     }

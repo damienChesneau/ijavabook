@@ -27,6 +27,7 @@ public interface Interpreter extends AutoCloseable {
      * Get output of your code inserted.
      *
      * @return List of console lines.
+     * @throws IOException if we can't access to output flux.
      */
     List<String> getOutput() throws IOException;
 
@@ -34,6 +35,7 @@ public interface Interpreter extends AutoCloseable {
      * Get output errors of your code inserted.
      *
      * @return List of console lines.
+     * @throws IOException if we can't access to output flux.
      */
     List<String> getErrors() throws IOException;
 
