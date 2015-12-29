@@ -6,7 +6,6 @@ import java.util.Objects;
  * @author Damien Chesneau
  */
 public class InterpretedLine {
-    //private final boolean valid;
     private final String value;
     private final String exception;
 
@@ -14,8 +13,7 @@ public class InterpretedLine {
      * @param value     Of interpreted expression.
      * @param exception If have an exception.
      */
-    InterpretedLine(String value, String exception/*, boolean valid*/) {
-        //this.valid = valid;
+    InterpretedLine(String value, String exception) {
         this.value = (value == null) ? "" : value;
         this.exception = Objects.requireNonNull(exception);
     }
@@ -28,7 +26,4 @@ public class InterpretedLine {
         return value;
     }
 
-   /* public boolean isValid() {
-        return valid;
-    }*/
 }

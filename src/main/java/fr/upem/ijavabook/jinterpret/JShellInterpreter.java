@@ -54,22 +54,24 @@ class JShellInterpreter implements Interpreter {
         synchronized (monitor) {
             eval = jShell.eval(line).get(0);
         }
+        return manageIfErrors(eval);
+    }
+
+    private InterpretedLine manageIfErrors(SnippetEvent eval) {
         Exception e = eval.exception();
-        String exception = "";
         if (eval.status() == Snippet.Status.REJECTED) {
-            exception = "Invalid syntax.";
+            return new InterpretedLine(eval.value(), "Invalid syntax.");
         } else if (e != null) {
-            exception = getAllStackTrace(e);
+            return new InterpretedLine(eval.value(), getAllStackTrace(e));
         }
-        return new InterpretedLine(eval.value(), exception/*,
-                eval.status().name().equals("VALID")*/);
+        return new InterpretedLine(eval.value(), "");
     }
 
     private String getAllStackTrace(Exception e) {
         StringBuilder stackTraceBuilder = new StringBuilder();
         stackTraceBuilder.append(e.toString()).append("\n");
         StackTraceElement[] stackTraceElements = e.getStackTrace();
-        for (int i = 0; i<stackTraceElements.length-2;i++) {
+        for (int i = 0; i < stackTraceElements.length - 2; i++) {
             stackTraceBuilder.append(stackTraceElements[i].toString()).append("\n");
         }
         return stackTraceBuilder.toString();
