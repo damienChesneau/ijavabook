@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Implementation how controls all of server flux.
@@ -73,7 +71,9 @@ class ServerImpl implements Server {
     private void closeExercise(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
-                    TransactionParser<ArrayList<String>> vals = TransactionParser.parseAsObject(event.toString());
+                    System.out.println(event.toString());
+                    TransactionParser<List<String>> vals = TransactionParser.parseTransactionParserWithMessageArray(event.toString());
+                    System.out.println(vals.getMessage());
                     Path exerciseOfClient = Paths.get(vals.getMessage().get(1) + ".text");
                     exerciseService.closeExercise(exerciseOfClient);
                     int token = Integer.parseInt(vals.getMessage().get(0));

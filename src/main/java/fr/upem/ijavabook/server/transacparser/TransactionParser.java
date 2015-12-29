@@ -56,28 +56,15 @@ public class TransactionParser<T> {
      * @param query Request to parse as an Json object
      * @return return the corresponding transaction parser
      */
-    public static <T> TransactionParser<T> parseAsObject(String query) {
+    public static TransactionParser<List<String>> parseTransactionParserWithMessageArray(String query) {
         Objects.requireNonNull(query);
         JsonObject json = new JsonObject(query);
         String tpAsStr = json.getString(TransactionPattern.TYPE_PATTERN.getTranslation());
-        try {
-            JsonArray jsonArray = json.getJsonArray(TransactionPattern.MESSAGE_PATTERN.getTranslation());
-            @SuppressWarnings("unchecked")
-            T list = (T) jsonArray.getList();
-            return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), list);
-        } catch (ClassCastException e) {
-            @SuppressWarnings("unchecked")
-            T message = (T) json.getValue(TransactionPattern.MESSAGE_PATTERN.getTranslation());
-            return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), message); // TO REFORMAT
-        }
+        JsonArray jsonArray = json.getJsonArray(TransactionPattern.MESSAGE_PATTERN.getTranslation());
+        @SuppressWarnings("unchecked")//Yes it is a safe suppress waning is the API returns a row type...
+        ArrayList<String> returnl = new ArrayList<>(jsonArray.getList());
+        return new TransactionParser<>(TransactionPattern.getByTranslation(tpAsStr), returnl);
     }
-
-    /*public static TransactionParser parseAsObject(LinkedHashMap query) {
-        Objects.requireNonNull(query);
-        String tpAsStr = String.valueOf(query.get(TransactionPattern.TYPE_PATTERN.getTranslation()));
-        String message = String.valueOf(query.get(TransactionPattern.MESSAGE_PATTERN.getTranslation()));
-        return new TransactionParser(TransactionPattern.getByTranslation(tpAsStr), message);
-    }*/
 
     /**
      * static factory to parseAsObject your json object to POJO.
@@ -88,24 +75,20 @@ public class TransactionParser<T> {
     public static List<TransactionParser<String>> parseAsArray(String query) {
         Objects.requireNonNull(query);
         JsonArray json = new JsonArray(query);
-        @SuppressWarnings("unchecked")//Yes i say what i do.
-        List<LinkedHashMap<String,String>> list = (List<LinkedHashMap<String, String>>) json.getList();
+        @SuppressWarnings("unchecked")//Yes it is a safe suppress waning is the API returns a row type...
+                List<LinkedHashMap<String, String>> list = (List<LinkedHashMap<String, String>>) json.getList();
         ArrayList<TransactionParser<String>> parsed = new ArrayList<>();
         for (LinkedHashMap<String, String> lhp : list) {
-            String message = String.valueOf(lhp.get("m"));
+            String message = String.valueOf(lhp.get(TransactionPattern.MESSAGE_PATTERN.getTranslation()));
             TransactionPattern type = TransactionPattern.getByTranslation(String.valueOf(lhp.get("t")));
             parsed.add(new TransactionParser<>(type, message));
         }
         return parsed;
     }
 
-    /*public static BuilderJavaInterpreted builderJavaInterpreted(TransactionPattern type, String output) {
-        return new BuilderJavaInterpreted(type, output);
-    }*/
-
     /**
-     * Builde a new BuilderJavaInterpreted
-     *
+     * Build a new BuilderJavaInterpreted
+     * @param <T> Are the type of transaction pattern message.
      * @param type   type of the transactionPattern
      * @param output everylines of the interpreted output.
      * @return a new instance of BuilderJavaInterpreted.
@@ -119,8 +102,6 @@ public class TransactionParser<T> {
      */
     public static class BuilderJavaInterpreted<T> {
         private final TransactionPattern type;
-        /*private String message;
-        private List<InterpretedLine> ils;*/
         private InterpretedLine il;
         private String output;
 
@@ -128,16 +109,6 @@ public class TransactionParser<T> {
             this.type = Objects.requireNonNull(type);
             this.output = Objects.requireNonNull(output);
         }
-
-        /*public BuilderJavaInterpreted setMessage(String message) {
-            this.message = message;
-            return this;
-        }
-
-        public BuilderJavaInterpreted setInterpretedLines(List<InterpretedLine> ils) {
-            this.ils = ils;
-            return this;
-        }*/
 
         public BuilderJavaInterpreted<T> setInterpretedLine(InterpretedLine il) {
             this.il = il;
@@ -162,16 +133,7 @@ public class TransactionParser<T> {
             JsonArray jm = new JsonArray();
             jm.add(output);
             ja.add(jm);
-            /*if (message == null) {
-                if (il != null) {*/
             ja.add(jsonArrayForLine(il));
-               /* } else {
-                    List<JsonArray> str = ils.stream().map((li) -> jsonArrayForLine(li)).collect(Collectors.toList());
-                    str.forEach((item) -> ja.add(item));
-                }
-            } else {
-                ja.add(message);
-            }*/
             return new TransactionParser<>(this.type, ja);
         }
     }

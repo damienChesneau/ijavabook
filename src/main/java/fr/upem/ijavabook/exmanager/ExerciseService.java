@@ -30,6 +30,7 @@ public interface ExerciseService {
      * All element is not a markdown file are filtred.
      *
      * @return a list of markdown files.
+     * @throws IOException if we can't load files.
      */
     List<Path> getAllByDirectory() throws IOException;
 
@@ -38,6 +39,7 @@ public interface ExerciseService {
      * All element is not a markdown file are filtred.
      *
      * @return a list of exercises names.
+     * @throws IOException if we can't load files.
      */
     List<String> getFilesNamesWithoutExtension() throws IOException;
 }
