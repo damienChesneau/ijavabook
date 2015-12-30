@@ -169,7 +169,7 @@ class ExerciseImpl implements ExerciseService {
     }
 
     /**
-     * Get the traduction of the Markdown to HTML
+     * Get the translation of the Markdown to HTML
      * @param file source path of the Markdown
      * @return HTML string
      * @throws IOException
