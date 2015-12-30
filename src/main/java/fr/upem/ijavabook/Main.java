@@ -36,6 +36,7 @@ public class Main {
         while (input.hasNext()) {
             if (input.next().equals("Q")) {
                 srv.stop();
+                input.close();
                 System.exit(0);
             }
         }
