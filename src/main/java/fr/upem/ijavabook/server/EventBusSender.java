@@ -24,14 +24,16 @@ public class EventBusSender {
         this.eventBus = Objects.requireNonNull(eventBus);
     }
 
+    /**
+     * Send an update of an exercise.
+     * @param file name of the file
+     * @param htmlContent html of this file.
+     */
     public void send(Path file, String htmlContent) {
         Objects.requireNonNull(file);
         Objects.requireNonNull(htmlContent);
-        Path pathFileName;
-        if ((pathFileName = file.getFileName()) == null) {
-            String filename = file.toString();
-            filename = filename.substring(0, filename.length() - 5);
-            eventBus.send(filename, new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, htmlContent).toJson());
-        }
+        String filename = file.toString();
+        filename = filename.substring(0, filename.length() - 5);
+        eventBus.publish(filename, new TransactionParser<>(TransactionPattern.RESPONSE_EXERCISE, htmlContent).toJson());
     }
 }

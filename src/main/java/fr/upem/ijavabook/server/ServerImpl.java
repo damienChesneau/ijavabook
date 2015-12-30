@@ -71,9 +71,7 @@ class ServerImpl implements Server {
     private void closeExercise(RoutingContext routingContext, ExerciseService exerciseService) {
         routingContext.request().bodyHandler(event ->
                 threadPool.execute(() -> {
-                    System.out.println(event.toString());
                     TransactionParser<List<String>> vals = TransactionParser.parseTransactionParserWithMessageArray(event.toString());
-                    System.out.println(vals.getMessage());
                     Path exerciseOfClient = Paths.get(vals.getMessage().get(1) + ".text");
                     exerciseService.closeExercise(exerciseOfClient);
                     int token = Integer.parseInt(vals.getMessage().get(0));
