@@ -1,3 +1,9 @@
-![Update this](/path/imgBuilder.jpg "Coucou")
+#EXERCICE 1
 
-### TOFSD ###
+Faites une fonction int sum(int a, int b) qui calcule une somme
+
+<junit>int a=5;
+int b = 7;
+
+Assert.assertEquals(sum(a,b),12);
+</junit>

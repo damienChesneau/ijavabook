@@ -154,10 +154,7 @@ class ExerciseImpl implements ExerciseService {
 
     private boolean filterMarkdownFile(Path path) {
         String markdownExtension = ".text";
-        if ((path = path.getFileName()) != null) {
-            return path.toString().contains(markdownExtension);
-        }
-        return true;
+        return (path = path.getFileName()) == null || path.toString().contains(markdownExtension);
     }
 
     @Override
@@ -171,11 +168,19 @@ class ExerciseImpl implements ExerciseService {
                 .collect(Collectors.<String>toList());
     }
 
+    /**
+     * Get the traduction of the Markdown to HTML
+     * @param file source path of the Markdown
+     * @return HTML string
+     * @throws IOException
+     * @bug Sometimes Files.lines returns an empty string.
+     *      We "patched" it with a while(Files.lines(..).isEmpty); but it's not a resolution of the bug.
+     */
     private String getHtmlOfAMarkdown(Path file) throws IOException {
         Parser parser = new Parser(rootDirectory);
         String lines;
         synchronized (fileMonitor) {
-            lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"));
+            while((lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"))).isEmpty());
         }
         return parser.parseMarkdown(lines);
     }
