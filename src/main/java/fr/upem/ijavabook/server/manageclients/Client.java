@@ -24,11 +24,6 @@ public class Client implements Interpreter {
     }
 
     @Override
-    public List<InterpretedLine> interpretAll(List<String> lines) {
-        return interpreter.interpretAll(lines);
-    }
-
-    @Override
     public List<String> getOutput() throws IOException {
         return interpreter.getOutput();
     }

@@ -16,14 +16,6 @@ public interface Interpreter extends AutoCloseable {
     InterpretedLine interpret(String line);
 
     /**
-     * Same as interpret method but for many lines.
-     *
-     * @param lines of Java code.
-     * @return Java result or exception.
-     */
-    List<InterpretedLine> interpretAll(List<String> lines);
-
-    /**
      * Get output of your code inserted.
      *
      * @return List of console lines.

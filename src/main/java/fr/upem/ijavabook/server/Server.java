@@ -16,5 +16,4 @@ public interface Server {
      * Stop server.
      */
     void stop();
-
 }

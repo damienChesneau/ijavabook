@@ -5,6 +5,7 @@ import fr.upem.ijavabook.server.Servers;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 /**
  * JShell Book program input.
@@ -25,5 +26,12 @@ public class Main {
         Server srv = Servers.getServer(markdownFolder);
         String start = srv.start();
         System.out.println("Server started on : " + start);
+        Scanner input = new Scanner(System.in);
+        System.out.println("For stop the server, press Q");
+        while(input.hasNext()){
+            if(input.next().equals("Q")){
+                srv.stop();
+            }
+        }
     }
 }

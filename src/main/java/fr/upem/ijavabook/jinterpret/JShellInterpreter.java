@@ -44,11 +44,6 @@ class JShellInterpreter implements Interpreter {
     }
 
     @Override
-    public List<InterpretedLine> interpretAll(List<String> lines) {
-        return lines.stream().map(this::interpret).collect(Collectors.<InterpretedLine>toList());
-    }
-
-    @Override
     public InterpretedLine interpret(String line) {
         SnippetEvent eval;
         synchronized (monitor) {
