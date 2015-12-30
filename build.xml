@@ -2,27 +2,28 @@
     <target name="all" depends="clean, compile, jar, javadoc"/>
 
     <target name="clean">
-        <delete dir="target" quiet="true"/>
+        <delete dir="classes" quiet="true"/>
+        <delete dir="docs/api" quiet="true"/>
+        <delete dir="jshellbook.jar" quiet="true"/>
     </target>
 
     <path id="compile.classpath">
-        <fileset dir="lib" includes="*.jar"/>
+        <fileset dir="libs" includes="*.jar"/>
         <fileset dir="vertx/lib" includes="*.jar"/>
     </path>
 
     <target name="compile">
-        <mkdir dir="target/classes"/>
-        <javac srcdir="src/main" destdir="target/classes">
+        <mkdir dir="classes"/>
+        <javac srcdir="src/main" destdir="classes">
             <compilerarg value="-Xlint:all"/>
             <classpath refid="compile.classpath"/>
         </javac>
     </target>
     <target name="jar">
-        <mkdir dir="target"/>
-        <manifestclasspath property="jar.classpath" jarfile="target/jshellbook.jar">
+        <manifestclasspath property="jar.classpath" jarfile="jshellbook.jar">
             <classpath refid="compile.classpath"/>
         </manifestclasspath>
-        <jar destfile="target/jshellbook.jar" basedir="target/classes">
+        <jar destfile="jshellbook.jar" basedir="classes">
             <manifest>
                 <attribute name="Main-Class" value="fr.upem.ijavabook.Main"/>
                 <attribute name="Class-Path" value="${jar.classpath}"/>
