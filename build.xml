@@ -1,10 +1,10 @@
-<project name="ijavabook" default="all">
+<project name="ijavabook" default="all" >
     <target name="all" depends="clean, compile, jar, javadoc"/>
 
     <target name="clean">
         <delete dir="classes" quiet="true"/>
         <delete dir="docs/api" quiet="true"/>
-        <delete dir="jshellbook.jar" quiet="true"/>
+        <delete file="jshellbook.jar" quiet="true"/>
     </target>
 
     <path id="compile.classpath">
