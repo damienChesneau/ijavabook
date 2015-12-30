@@ -174,13 +174,12 @@ class ExerciseImpl implements ExerciseService {
      * @return HTML string
      * @throws IOException
      * @bug Sometimes Files.lines returns an empty string.
-     *      We "patched" it with a while(Files.lines(..).isEmpty); but it's not a resolution of the bug.
      */
     private String getHtmlOfAMarkdown(Path file) throws IOException {
         Parser parser = new Parser(rootDirectory);
         String lines;
         synchronized (fileMonitor) {
-            while((lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"))).isEmpty());
+           lines = Files.lines(rootDirectory.resolve(file.getFileName())).collect(Collectors.joining("\n"));
         }
         return parser.parseMarkdown(lines);
     }
