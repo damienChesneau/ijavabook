@@ -49,13 +49,10 @@ class RouteManager extends AbstractVerticle {
             onlyCurrentComputer(comingEvent.request().getHeader("Host"));
             routes.getEvent().doAction(comingEvent, exerciseSrv);
         })); // route to JSON REST APIs
-        BridgeOptions opts = getBridgeOptions(exerciseSrv);
-        SockJSHandler ebHandler = SockJSHandler.create(vertx).bridge(opts);
+        SockJSHandler ebHandler = SockJSHandler.create(vertx).bridge(getBridgeOptions(exerciseSrv));
         router.route("/eventbus/*").handler(ebHandler);
-        router.route().handler(StaticHandler.create("webroot"));// otherwise serve static pages
-        HttpServer httpServer = vertx.createHttpServer();
-        httpServer.requestHandler(router::accept);
-        httpServer.listen(Servers.SERVER_PORT);
+        router.route().handler(StaticHandler.create());// otherwise serve static pages
+        HttpServer httpServer = vertx.createHttpServer().requestHandler(router::accept).listen(Servers.SERVER_PORT);
     }
 
     private BridgeOptions getBridgeOptions(ExerciseService exerciseService) throws IOException {

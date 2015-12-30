@@ -55,7 +55,7 @@ class Route {
      *
      * @return route name.
      */
-    public String getRoute() {
+    String getRoute() {
         return routePath;
     }
 
@@ -63,7 +63,7 @@ class Route {
      * Return the type of the route.
      * @return post or get.
      */
-    public RequestType getRequestType() {
+    RequestType getRequestType() {
         return requestType;
     }
 }

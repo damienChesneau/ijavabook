@@ -13,9 +13,11 @@ var nbReq = 0;
 
 eventBus.onopen = function () {
     eventBus.registerHandler(getParameterByName("value"), function (message) {
+        console.log("message" + message);
         actionOnResponse(JSON.parse(message));
     });
-};
+}
+;
 
 $.ajax({
     dataType: "json",
@@ -40,9 +42,9 @@ function showHide() {
     }
 }
 
-function testAll(parent){
-    parent.each(function(index, element){
-        sendJavaTest(element.find("code"),element.find("pre"));
+function testAll(parent) {
+    parent.each(function (index, element) {
+        sendJavaTest(element.find("code"), element.find("pre"));
     });
 }
 
@@ -70,7 +72,7 @@ function actionOnResponse(jsonMessage) {
     }
 }
 
-function send(url,message,callback) {
+function send(url, message, callback) {
     $.ajax({
         dataType: "json",
         method: "POST",
@@ -94,34 +96,34 @@ function sendOnClose(message) {
 function placeValueInReq(type, value) {
     return {"t": type, "m": value};
 }
-//noinspection JSUnusedGlobalSymbols
+
 /**
  * Used for junit test so is ok if is not used.
  * @param code
  * @param result
  */
-function sendJavaTest(code,result){
+function sendJavaTest(code, result) {
     var content = code.text().replace(/\r/g, "\\n");
     content = content.replace("\n", "");
     var jsonArray = new Array();
     jsonArray.push(placeValueInReq("to", token));
-    jsonArray.push(placeValueInReq("rjt", '{'+content+'}'));
+    jsonArray.push(placeValueInReq("rjt", '{' + content + '}'));
     placeValueInReq("rjt", jsonArray);
-    send("/junittest",jsonArray,function(m){
+    send("/junittest", jsonArray, function (m) {
         console.log(m.m);
-        if(m.m == 'FAIL'){
-            result.css('color','red');
-        }else{
-            result.css('color','green');
+        if (m.m == 'FAIL') {
+            result.css('color', 'red');
+        } else {
+            result.css('color', 'green');
         }
     });
 }
 
-function passBloc(allRequests, current,openType,closeType){
+function passBloc(allRequests, current, openType, closeType) {
     var nbBlocs = 1;
-    while(nbBlocs!=0 && current<allRequests.length){
+    while (nbBlocs != 0 && current < allRequests.length) {
         current++;
-        switch (allRequests[current]){
+        switch (allRequests[current]) {
             case openType:
                 nbBlocs++;
                 break;
@@ -133,9 +135,9 @@ function passBloc(allRequests, current,openType,closeType){
     return current;
 }
 
-function addRequest(content,start, end){
-    var request =  content.substring(start,end+1);
-    if(request.replace(/\s/g,"").length != 0) {
+function addRequest(content, start, end) {
+    var request = content.substring(start, end + 1);
+    if (request.replace(/\s/g, "").length != 0) {
         requests[nbReq++] = request;
     }
 }
@@ -143,43 +145,43 @@ function addRequest(content,start, end){
 function splitJavaCode(allContent) {
     var start = 0;
     for (var i = 0; i < allContent.length; i++) {
-        switch(allContent[i]){
+        switch (allContent[i]) {
 
             case ';':
-                addRequest(allContent,start,i);
-                start = i+1;
+                addRequest(allContent, start, i);
+                start = i + 1;
                 break;
 
             case '{':
-                i = passBloc(allContent, i,'{','}');
-                addRequest(allContent,start,i);
-                start = i+1;
+                i = passBloc(allContent, i, '{', '}');
+                addRequest(allContent, start, i);
+                start = i + 1;
                 break;
 
             case '(':
-                i = passBloc(allContent, i,'(',')');
+                i = passBloc(allContent, i, '(', ')');
                 break;
 
             case '[':
-                i = passBloc(allContent, i,'([',']');
+                i = passBloc(allContent, i, '([', ']');
                 break;
 
             case '"':
-                i = passBloc(allContent, i,'"','"');
+                i = passBloc(allContent, i, '"', '"');
                 break;
 
             case '\'':
-                i = passBloc(allContent, i,'\'','\'');
+                i = passBloc(allContent, i, '\'', '\'');
                 break;
 
         }
     }
-    addRequest(allContent,start,allContent.length);
+    addRequest(allContent, start, allContent.length);
     nbReq = 0;
 }
 
-function sendAllLines(allCode){
-    if(canISend) {
+function sendAllLines(allCode) {
+    if (canISend) {
         canISend = false;
         var allContent = allCode.val();
         allCode.val('');
@@ -189,38 +191,31 @@ function sendAllLines(allCode){
 }
 
 function sendJavaCode(code) {
-    var content = code.replace(/\r|\n/g,"");
-    sendedLines = code.replace(/(\r|\n)+/g,'\n').split(/\r|\n/g);
+    var content = code.replace(/\r|\n/g, "");
+    sendedLines = code.replace(/(\r|\n)+/g, '\n').split(/\r|\n/g);
     var jsonArray = [];
     jsonArray.push(placeValueInReq("to", token));
     jsonArray.push(placeValueInReq("jc", (content)));
     placeValueInReq("jc", jsonArray);
-    send("/javacode",jsonArray,actionOnResponse);
+    send("/javacode", jsonArray, actionOnResponse);
 }
 
-//function verifyCode(line) {
-//
-//}
-
-//function replaceAll(str, find, replace) {
-//    return str.replace(new RegExp(find, 'g'), replace);
-//}
 function manageSingleLineConsole(message) {
     $("#output").html(message[0][0]);
     var sended = "";
-    for(var i =0; i<sendedLines.length;i++){
+    for (var i = 0; i < sendedLines.length; i++) {
         sended += sendedLines[i];
     }
-    for ( i = 1; i < message.length; i++) {
-        $("#console").append("<p>" + sended + "<br/><span  style=\"color: " + ((message[i][1] == true) ? 'green' : 'red') + "\">"+
-            ((message[1][1] == true && message[i][0] != "") ? ": "+ message[i][0] : message[i][2]) + "</span></p>");
+    for (i = 1; i < message.length; i++) {
+        $("#console").append("<p>" + sended + "<br/><span  style=\"color: " + ((message[i][1] == true) ? 'green' : 'red') + "\">" +
+            ((message[1][1] == true && message[i][0] != "") ? ": " + message[i][0] : message[i][2]) + "</span></p>");
     }
 
-    if(nbReq >= requests.length){
+    if (nbReq >= requests.length) {
         canISend = true;
         nbReq = 0;
         requests = [];
-    }else{
+    } else {
         sendJavaCode(requests[nbReq++]);
     }
 }
@@ -233,5 +228,5 @@ function getParameterByName(name) {
 }
 
 $(window).bind('beforeunload', function () {
-    sendOnClose(placeValueInReq("cex", new Array(""+token, getParameterByName("value"))));
+    sendOnClose(placeValueInReq("cex", new Array("" + token, getParameterByName("value"))));
 });

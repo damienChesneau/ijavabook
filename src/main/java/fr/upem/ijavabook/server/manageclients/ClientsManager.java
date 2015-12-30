@@ -1,6 +1,5 @@
 package fr.upem.ijavabook.server.manageclients;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
